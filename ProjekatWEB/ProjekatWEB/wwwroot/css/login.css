@@ -1,0 +1,161 @@
+@import url('https://fonts.googleapis.com/css?family=Raleway');
+
+* {
+    box-sizing: border-box;
+    font-family: 'Raleway', sans-serif;
+}
+
+body {
+	padding: 0;
+	margin: 0;
+	height: 100%;
+	background-color: #e4e4e4;
+	background: url("../imgs/rose-backg.jpg");
+	background-repeat: repeat;
+	overflow-x: hidden;
+}
+
+
+.col-1 {
+	width: 8.33%;
+	float: left;
+	padding: 1px;
+}
+.col-1c5 {
+	width: 12.494%;
+	float: left;
+     padding: 1px;
+}
+.col-2 {
+	width: 16.66%;
+	float: left;
+     padding: 1px;
+}
+.col-3 {
+	width: 25%;
+	float: left;
+     padding: 1px;
+}
+.col-4 {
+	width: 33.33%;
+	float: left;
+     padding: 1px;
+}
+.col-5 {
+	width: 41.66%;
+	float: left;
+     padding: 1px;
+}
+.col-6 {
+	width: 50%;
+	float: left;
+     padding: 1px;
+}
+.col-7 {
+	width: 58.33%;
+	float: left;
+     padding: 1px;
+}
+.col-8 {
+	width: 66.66%;
+	float: left;
+     padding: 1px;
+}
+.col-9 {
+	width: 75%;
+	float: left;
+     padding: 1px;
+}
+.col-10 {
+	width: 83.33%;
+	float: left;
+     padding: 1px;
+}
+.col-11 {
+	width: 91.66%;
+	float: left;
+     padding: 1px;
+}
+.col-12 {
+	width: 100%;
+	float: left;
+     padding: 1px;
+}
+
+.mainHeaderContainer {
+	text-align: center;
+}
+
+.logo {
+	display: inline-block;
+	padding: 20px 0;
+	font-size: 27px;
+	background-color: #7C3069;
+	border-radius: 10px;
+	color: white;
+	margin-bottom: 10px;
+}
+
+.header-container {
+	margin-top: 150px;
+}
+
+.main {
+	text-align: center;
+}
+
+#loginButton, #registerButton {
+	margin-top: 15px;
+	padding: 5px 15px;
+	border-radius: 8px;
+	font-size: 15px;
+	border: none;
+}
+
+#loginButton:hover, #registerButton:hover {
+	cursor: pointer;
+	background-color: #995F8B;
+	color: white;
+}
+
+#openRegistartionForm, #openLoginForm {
+	display: inline-block;
+	margin-top: 12px;
+	font-size: 14px;
+}
+
+#openRegistartionForm:hover, #openLoginForm:hover {
+	cursor: pointer;
+	color: #B88BAD;
+	text-decoration: underline;
+}
+
+.usernameContainer {
+	margin-top: 15px;
+}
+
+.passwordContainer {
+	margin-top: 10px;
+}
+
+.loginFormContainer, .registerFormContainer {
+	border-radius: 10px;
+	background-color: #7C3069;
+	color: white;
+}
+
+.tejblRegister {
+	display: inline-block;
+	margin-top: 25px;
+	margin-bottom: 10px;
+	color: white;
+	border-spacing: 8px;
+}
+
+.tejblRegister select {
+	width: 100%;
+}
+
+@media only screen and (max-width: 833px) {
+	
+}

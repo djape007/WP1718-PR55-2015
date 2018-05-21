@@ -1,0 +1,60 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=0.95, user-scalable=no">
+		<title>Taksi služba</title>
+		<link rel="stylesheet" type="text/css" href="css/login.css">
+	</head>
+	<body>
+		<div class="col-12 header-container">
+			<div class="col-3 spacer spacerLeft"></div>
+			<div class="col-6 mainHeaderContainer">
+				<div class="col-3 spacer spacerLeft"></div>
+				<span class="logo col-6">Taksi služba - RUŽA</span>
+				<div class="col-3 spacer spacerRight"></div>
+			</div>
+			<div class="col-3 spacer spacerRight"></div>
+		</div>
+		<div class="col-12 main-container">
+			<div class="col-3 spacer spacerLeft"></div>
+			<div class="col-6 main">
+				<div class="col-3 spacer spacerLeft"></div>
+				<div style='display: none;' class="loginFormContainer col-6">
+					<form method="" action="">
+						<div class='usernameContainer'><span>Korisničko ime:</span></div>
+						<div><input type='text'/></div>
+						<div class='passwordContainer'><span>Šifra:</span></div>
+						<div><input type='password'/></div>
+						<div><button id='loginButton' type='submit'>Uloguj se</button></div>
+						<div><span id='openRegistartionForm'>Nemaš nalog?</span></div>
+					</form>
+				</div>
+				<div class="registerFormContainer col-6">
+					<form method="" action="">
+						<table class='tejblRegister'>
+							<tr>
+								<td>Korisničko ime</td><td><input type='text'/></td>
+							</tr>
+							<tr>
+								<td>Šifra</td><td><input type='password'/></td>
+							</tr>
+							<tr>
+								<td>Ponovi šifru</td><td><input type='password'/></td>
+							</tr>
+							<tr>
+								<td>E-mail</td><td><input type='text'/></td>
+							</tr>
+							<tr>
+								<td>Pol</td><td><select><option>M</option><option>Z</option></select></td>
+							</tr>
+						</table>
+						<div><button id='registerButton' type='submit'>Registruj se</button></div>
+						<div><span id='openLoginForm'>Imaš nalog?</span></div>
+					</form>
+				</div>
+				<div class="col-3 spacer spacerRight"></div>
+			</div>
+			<div class="col-3 spacer spacerRight"></div>
+		</div>
+	</body>
+</html>

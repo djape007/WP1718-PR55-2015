@@ -1,0 +1,5 @@
+svetlija2: #B88BAD
+svetlija1: #995F8B
+primarna: #7C3069 [124, 48, 105]
+tamnija1: #5C0B48
+tamnija2: #3D002E
