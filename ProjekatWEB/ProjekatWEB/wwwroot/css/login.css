@@ -156,6 +156,22 @@ body {
 	width: 100%;
 }
 
-@media only screen and (max-width: 833px) {
+@media only screen and (max-width: 1350px) {
+	.main, .mainHeaderContainer, .loginFormContainer, .logo, .registerFormContainer {
+		width: 80%;
+	}
 	
+	.spacer {
+		width: 10%;
+	}
+}
+
+@media only screen and (max-width: 833px) {
+	[class*="col-"] {
+	    width: 100%;
+	}
+	
+	.spacer {
+		display: none;
+	}
 }
