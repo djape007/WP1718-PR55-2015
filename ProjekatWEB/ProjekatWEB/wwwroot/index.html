@@ -1,8 +1,37 @@
-<html>
+﻿<html>
 	<head>
 		<title>WOW radi</title>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 	</head>
-	<body>
-		<h1>Test pocetna strana</h1>
-	</body>
+    <body>
+        <script>
+            function PostZahtev(usernamee, passww, imee, prezimee) {
+                $.post("/api/Korisnici/", { username: usernamee, password: passww, ime: imee, prezime: prezimee }, function (data) {
+                    //console.log(data);
+                    $("#output").text("Korisnik je napravljen");
+                }, "json");
+            }
+
+            function GetSveZahtev() {
+                $.get("/api/Korisnici/", function (data) {
+                    console.log(data);
+                    $("#output").text("");
+                    for (var k in data) {
+                        $("#output").text($("#output").text() + data[k]['id'] + "||" + data[k]['username'] + "\n");
+                    }
+                }, "json");
+            }
+
+            function GetJednog(idKorisnika) {
+                $.get("/api/Korisnici/" + idKorisnika.toString(), {}, function (data) {
+                    console.log(data);
+                }, "json");
+            }
+
+        </script>
+        <h1>Test pocetna strana</h1>
+        <button onclick="GetSveZahtev();">Svi korisnici</button>
+        <button onclick="PostZahtev('test123','šifra123','imeneko','prezimeJošJačee');">Dodaj test korisnika</button>
+        <p id="output"></p>
+    </body>
 </html>
