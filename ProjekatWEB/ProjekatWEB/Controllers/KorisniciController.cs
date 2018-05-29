@@ -18,10 +18,8 @@ namespace ProjekatWEB.Controllers
         [HttpGet]
         public JsonResult Get() {
             List<Korisnik> v = new List<Korisnik>();
-            if (ms.Musterije.Lista.Count > 0) {
+            if (ms.Musterije.Count > 0) {
                 foreach (Korisnik k in ms.Musterije.Lista) {
-                    //var jsonObj = JsonConvert.SerializeObject(k, Newtonsoft.Json.Formatting.None, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore });
-                    //System.Diagnostics.Debug.WriteLine(jsonObj);
                     v.Add(k);
                 }
             } else {
@@ -36,7 +34,6 @@ namespace ProjekatWEB.Controllers
         {
 
             if (id >= 0) {
-                //s = JsonConvert.SerializeObject(ms.Musterije.Lista[id], Newtonsoft.Json.Formatting.None, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore});
                 return Json(ms.Musterije.Lista[id]);
             }
 
@@ -49,7 +46,7 @@ namespace ProjekatWEB.Controllers
         {
             if (username.Trim() != "" && password.Trim() != "" && ime.Trim() != "" && prezime.Trim() != "") {
                 Musterija m = new Musterija() { Ime = ime, Username = username, Password = password, Prezime = prezime };
-                ms.Musterije.AddAndSave(m);
+                ms.Musterije.Add(m);
             }
         }
         

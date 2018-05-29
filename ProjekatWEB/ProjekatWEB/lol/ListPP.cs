@@ -25,32 +25,57 @@ namespace ProjekatWEB
 
         public List<T> Lista {
             get { return l; }
-            set { l = value; }
         }
 
-        public void AddAndSave(T t) {
+        public void Add(T t) {
             l.Add(t);
             SacuvajNaHDD();
         }
 
-        public void RemoveAtAndSave(int indeks) {
+        public void RemoveAt(int indeks) {
             l.RemoveAt(indeks);
             SacuvajNaHDD();
         }
 
-        public void RemoveAllAndSave(Predicate<T> predicate) {
+        public void Remove(T t) {
+            l.Remove(t);
+            SacuvajNaHDD();
+        }
+
+        public void RemoveAll(Predicate<T> predicate) {
             l.RemoveAll(predicate);
             SacuvajNaHDD();
         }
 
-        public void ClearAndSave() {
+        public void Clear() {
             l.Clear();
             SacuvajNaHDD();
         }
 
+        public int Count {
+            get { return l.Count; }
+        }
+
+        public T Find(Predicate<T> predicate) {
+            return l.Find(predicate);
+        }
+
+        public void ForEach(Action<T> action) {
+            l.ForEach(action);
+            SacuvajNaHDD();
+        }
+        
+        public IEnumerable<T> Where(Func<T, bool> func) {
+            return l.Where(func);
+        }
+
+        public List<T> FindAll(Predicate<T> predicate) {
+            return l.FindAll(predicate);
+        }
+
         public void SacuvajNaHDD() {
             using (StreamWriter sw = new StreamWriter(putanja, false, System.Text.Encoding.UTF8)) {
-                var zaUpis = JsonConvert.SerializeObject(l);
+                var zaUpis = JsonConvert.SerializeObject(l, Formatting.Indented);
                 sw.Write(zaUpis);
             }
         }

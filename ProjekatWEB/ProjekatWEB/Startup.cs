@@ -29,6 +29,7 @@ namespace ProjekatWEB
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            //da stigne da se ucita sa harda
             MainStorage ms = MainStorage.Instanca;
 
             if (env.IsDevelopment())
