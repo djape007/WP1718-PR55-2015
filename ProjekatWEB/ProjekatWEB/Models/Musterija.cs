@@ -7,5 +7,9 @@ namespace ProjekatWEB
 {
     public class Musterija : Korisnik
     {
+
+        public Musterija() {
+            base.TipNaloga = TipNaloga.Musterija;
+        }
     }
 }

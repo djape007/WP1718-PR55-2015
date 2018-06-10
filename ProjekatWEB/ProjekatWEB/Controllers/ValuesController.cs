@@ -11,9 +11,25 @@ namespace ProjekatWEB.Controllers
     {
         // GET api/values
         [HttpGet]
-        public IEnumerable<string> Get()
+        public JsonResult Get(int id, string tn_str)
         {
-            return new string[] { "value1", "value2" };
+            TipNaloga tn = TipNaloga.Musterija;
+            
+            if (tn_str == null || tn_str == "") {
+                return Json("VOJKO V NE MOZE");
+            } else if (tn_str == TipNaloga.Dispecer.ToString()) {
+                tn = TipNaloga.Dispecer;
+            } else if (tn_str == TipNaloga.Musterija.ToString()) {
+                tn = TipNaloga.Musterija;
+            } else if (tn_str == TipNaloga.Vozac.ToString()) {
+                tn = TipNaloga.Vozac;
+            }
+            
+            if (Authorize.IsAllowedToAccess(id, tn, TipNaloga.Musterija)) {
+                return Json("uspeo");
+            } else {
+                return Json("VOJKO V NE MOZE");
+            }
         }
 
         // GET api/values/5

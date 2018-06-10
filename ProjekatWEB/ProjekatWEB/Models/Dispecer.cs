@@ -7,5 +7,8 @@ namespace ProjekatWEB
 {
     public class Dispecer : Korisnik
     {
+        public Dispecer() {
+            base.TipNaloga = TipNaloga.Dispecer;
+        }
     }
 }

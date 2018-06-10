@@ -41,5 +41,67 @@ namespace ProjekatWEB
         public ListPP<Vozac> Vozaci { get => vozaci; set => vozaci = value; }
         public ListPP<Voznja> Voznje { get => voznje; set => voznje = value; }
         public ListPP<Dispecer> Dispeceri { get => dispeceri; set => dispeceri = value; }
+
+        public Korisnik NadjiKorisnikaPoId(int id) {
+            Korisnik k = null;
+
+            foreach(Musterija m in musterije.Lista) {
+                if (m.ID == id) {
+                    k = m;
+                    break;
+                }
+            }
+
+            if (k == null) {
+                foreach (Vozac v in vozaci.Lista) {
+                    if (v.ID == id) {
+                        k = v;
+                        break;
+                    }
+                }
+            }
+
+            if (k == null) {
+                foreach (Dispecer d in dispeceri.Lista) {
+                    if (d.ID == id) {
+                        k = d;
+                        break;
+                    }
+                }
+            }
+
+            return k;
+        }
+
+        public Korisnik NadjiKorisnikaPoUsernameu(string username) {
+            Korisnik k = null;
+
+            foreach (Musterija m in musterije.Lista) {
+                if (m.Username == username) {
+                    k = m;
+                    break;
+                }
+            }
+
+            if (k == null) {
+                foreach (Vozac v in vozaci.Lista) {
+                    if (v.Username == username) {
+                        k = v;
+                        break;
+                    }
+                }
+            }
+
+            if (k == null) {
+                foreach (Dispecer d in dispeceri.Lista) {
+                    if (d.Username == username) {
+                        k = d;
+                        break;
+                    }
+                }
+            }
+
+            return k;
+        }
     }
 }

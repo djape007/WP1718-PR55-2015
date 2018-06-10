@@ -33,7 +33,7 @@ namespace ProjekatWEB.Controllers
         public JsonResult Get(int id)
         {
 
-            if (id >= 0) {
+            if (id >= 0 && id < ms.Musterije.Count) {
                 return Json(ms.Musterije.Lista[id]);
             }
 
@@ -42,24 +42,35 @@ namespace ProjekatWEB.Controllers
         
         // POST: api/Korisnici
         [HttpPost]
-        public void Post(string username, string password, string ime, string prezime)
+        public JsonResult Post(string username, string password, string ime, string prezime)
         {
-            if (username.Trim() != "" && password.Trim() != "" && ime.Trim() != "" && prezime.Trim() != "") {
-                Musterija m = new Musterija() { Ime = ime, Username = username, Password = password, Prezime = prezime };
-                ms.Musterije.Add(m);
+            if (username != null && password != null && ime != null && prezime != null && username.Trim() != "" && password.Trim() != "" && ime.Trim() != "" && prezime.Trim() != "") {
+                try {
+                    Musterija m = new Musterija() { Ime = ime, Username = username, Password = password, Prezime = prezime };
+                    ms.Musterije.Add(m);
+                    return Json("OK");
+                } catch {
+                    return Json("ERROR_USERNAME_EXISTS");
+                }
+            } else {
+                return Json("ERROR_FORM_NOT_COMPLETE");
             }
         }
         
         // PUT: api/Korisnici/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        public void Put(int id, string value)
         {
+
         }
-        
-        // DELETE: api/ApiWithActions/5
+
+        // DELETE: api/Korisnici/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+            if (ms.Musterije.Count > id) {
+                ms.Musterije.RemoveAt(id);
+            }
         }
     }
 }

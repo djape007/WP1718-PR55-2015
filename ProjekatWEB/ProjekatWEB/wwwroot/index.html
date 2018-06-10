@@ -1,37 +1,106 @@
 ﻿<html>
-	<head>
-		<title>WOW radi</title>
-        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-	</head>
-    <body>
-        <script>
-            function PostZahtev(usernamee, passww, imee, prezimee) {
-                $.post("/api/Korisnici/", { username: usernamee, password: passww, ime: imee, prezime: prezimee }, function (data) {
-                    //console.log(data);
+<head>
+    <title>WOW radi</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="js/js.cookie.js"></script>
+</head>
+<body>
+    <script>
+
+        var ACC_ID = -1;
+        var TIP_NALOGA = "";
+
+        function PostZahtev(usernamee, passww, imee, prezimee) {
+            $.post("/api/Korisnici/", { username: usernamee, password: passww, ime: imee, prezime: prezimee }, function (data) {
+                //console.log(data);
+                if (data === "OK") {
                     $("#output").text("Korisnik je napravljen");
-                }, "json");
-            }
+                } else if (data === "ERROR_USERNAME_EXISTS") {
+                    $("#output").text("Korisnicko ime vec postoji");
+                } else if (data === "ERROR_FORM_NOT_COMPLETE") {
+                    $("#output").text("Neko polje nije popunjeno :(");
+                }
+            }, "json");
+        }
 
-            function GetSveZahtev() {
-                $.get("/api/Korisnici/", function (data) {
-                    console.log(data);
-                    $("#output").text("");
-                    for (var k in data) {
-                        $("#output").text($("#output").text() + data[k]['id'] + "||" + data[k]['username'] + "\n");
-                    }
-                }, "json");
-            }
+        function DodajKorisnika() {
+            PostZahtev($("#username").val(), $("#password").val(), $("#ime").val(), $("#prezime").val());
+        }
 
-            function GetJednog(idKorisnika) {
-                $.get("/api/Korisnici/" + idKorisnika.toString(), {}, function (data) {
-                    console.log(data);
-                }, "json");
-            }
+        function GetSveZahtev() {
+            $.get("/api/Korisnici/", function (data) {
+                console.log(data);
+                $("#output").text("SVI KORISNICI:  ");
+                for (var k in data) {
+                    $("#output").text($("#output").text() + data[k]['id'] + "||" + data[k]['username'] + "\n");
+                }
+            }, "json");
+        }
 
-        </script>
-        <h1>Test pocetna strana</h1>
-        <button onclick="GetSveZahtev();">Svi korisnici</button>
-        <button onclick="PostZahtev('test123','šifra123','imeneko','prezimeJošJačee');">Dodaj test korisnika</button>
-        <p id="output"></p>
-    </body>
+        function GetJednog(idKorisnika) {
+            $.get("/api/Korisnici/" + idKorisnika.toString(), {}, function (data) {
+                console.log(data);
+            }, "json");
+        }
+
+        function GetJdng() {
+            GetJednog($("#idKorisnika").val());
+        }
+
+        function DeleteAt(indks) {
+            $.ajax({
+                url: '/api/Korisnici/' + indks.toString(),
+                type: 'DELETE',
+                success: function (result) {
+                    console.log("OBRISANO");
+                }
+            });
+        }
+
+        function Obrisi() {
+            DeleteAt($("#idKorisnika").val());
+        }
+
+        function PristupiZasticenomDelu() {
+            $.get("/api/Values/", { id: ACC_ID, tn_str: TIP_NALOGA}, function (data) {
+                console.log(data);
+            });
+        }
+
+        function Login() {
+            $.post("/api/Login", { username: $("#lgn_username").val(), password: $("#lgn_password").val() }, function (data) {
+                console.log(data);
+                if (data['result'] === "OK") {
+                    $("#output").text("ULOGOVAN");
+                    ACC_ID = parseInt(data['accID']);
+                    TIP_NALOGA = data['accType'];
+                } else if (data['result'] === "ERROR") {
+                    $("#output").text("GRESKA");
+                }
+            }, "json");
+        }
+
+    </script>
+    <h1>Test pocetna strana</h1>
+    <button onclick="GetSveZahtev();">Svi korisnici</button><br />
+
+    <input type="text" id="username" placeholder="korisnicko ime" /><br />
+    <input type="password" id="password" placeholder="sifra" /><br />
+    <input type="text" id="ime" placeholder="ime" /><br />
+    <input type="text" id="prezime" placeholder="prezime" /><br />
+    <button onclick="DodajKorisnika();">Dodaj korisnika</button><br /><br />
+
+    <input type="text" id="idKorisnika" />
+    <button onclick="GetJdng()">Prikazi korisnika</button>
+    <button onclick="Obrisi()">Obrisi korisnika</button>
+
+    <p>LOGIN</p>
+    <input type="text" id="lgn_username" placeholder="korisnicko ime" /><br />
+    <input type="password" id="lgn_password" placeholder="sifra" /><br />
+    <button onclick="Login()">Login</button><br />
+    <button onclick="PristupiZasticenomDelu()">Pristupi tajnim podacima</button>
+
+    <p>Poruka</p>
+    <p id="output"></p>
+</body>
 </html>

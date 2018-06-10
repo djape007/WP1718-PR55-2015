@@ -9,5 +9,9 @@ namespace ProjekatWEB
     {
         public Lokacija TrenutnaLokacija { get; set; }
         public Automobil Automobil { get; set; }
+
+        public Vozac() {
+            base.TipNaloga = TipNaloga.Vozac;
+        }
     }
 }
