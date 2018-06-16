@@ -38,11 +38,11 @@ namespace ProjekatWEB
             }
 
             app.UseStatusCodePagesWithReExecute("/");
+            
+            app.UseMvc();
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
-            
-            app.UseMvc();
         }
     }
 }

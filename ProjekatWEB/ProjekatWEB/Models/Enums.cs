@@ -17,10 +17,12 @@ namespace ProjekatWEB
         Zona4
     }
 
+    [Flags]
     public enum TipNaloga {
-        Musterija,
-        Vozac,
-        Dispecer
+        Greska = 0,
+        Musterija = 1,
+        Vozac = 2,
+        Dispecer = 4
     }
 
     public enum StatusVoznje {
@@ -30,7 +32,8 @@ namespace ProjekatWEB
         Obradjena,
         Prihvacena,
         Neuspesna,
-        Uspesna
+        Uspesna,
+        UToku
     }
 
     public enum TipAutomobila {

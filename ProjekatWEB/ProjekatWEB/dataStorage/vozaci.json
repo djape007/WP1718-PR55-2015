@@ -1,0 +1,18 @@
+﻿[
+  {
+    "TrenutnaLokacija": null,
+    "Automobil": null,
+    "ID": 3,
+    "Username": "vozac",
+    "Password": "vozac",
+    "Ime": "Steva",
+    "Prezime": "Vozac",
+    "Pol": 0,
+    "JMBG": "3210987654321",
+    "Telefon": "555544433",
+    "Email": "vozac@kvote.rs",
+    "TipVoznje": 0,
+    "TipNaloga": 2,
+    "AktivanNalog": true
+  }
+]

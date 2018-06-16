@@ -1,106 +1,85 @@
 ﻿<html>
 <head>
-    <title>WOW radi</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.95, user-scalable=no">
+    <title>Taksi služba</title>
+    <link rel="stylesheet" type="text/css" href="css/login.css">
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="js/js.cookie.js"></script>
+    <script src="js/helper.js"></script>
+    <script src="js/login.js"></script>
 </head>
-<body>
-    <script>
-
-        var ACC_ID = -1;
-        var TIP_NALOGA = "";
-
-        function PostZahtev(usernamee, passww, imee, prezimee) {
-            $.post("/api/Korisnici/", { username: usernamee, password: passww, ime: imee, prezime: prezimee }, function (data) {
-                //console.log(data);
-                if (data === "OK") {
-                    $("#output").text("Korisnik je napravljen");
-                } else if (data === "ERROR_USERNAME_EXISTS") {
-                    $("#output").text("Korisnicko ime vec postoji");
-                } else if (data === "ERROR_FORM_NOT_COMPLETE") {
-                    $("#output").text("Neko polje nije popunjeno :(");
-                }
-            }, "json");
-        }
-
-        function DodajKorisnika() {
-            PostZahtev($("#username").val(), $("#password").val(), $("#ime").val(), $("#prezime").val());
-        }
-
-        function GetSveZahtev() {
-            $.get("/api/Korisnici/", function (data) {
-                console.log(data);
-                $("#output").text("SVI KORISNICI:  ");
-                for (var k in data) {
-                    $("#output").text($("#output").text() + data[k]['id'] + "||" + data[k]['username'] + "\n");
-                }
-            }, "json");
-        }
-
-        function GetJednog(idKorisnika) {
-            $.get("/api/Korisnici/" + idKorisnika.toString(), {}, function (data) {
-                console.log(data);
-            }, "json");
-        }
-
-        function GetJdng() {
-            GetJednog($("#idKorisnika").val());
-        }
-
-        function DeleteAt(indks) {
-            $.ajax({
-                url: '/api/Korisnici/' + indks.toString(),
-                type: 'DELETE',
-                success: function (result) {
-                    console.log("OBRISANO");
-                }
-            });
-        }
-
-        function Obrisi() {
-            DeleteAt($("#idKorisnika").val());
-        }
-
-        function PristupiZasticenomDelu() {
-            $.get("/api/Values/", { id: ACC_ID, tn_str: TIP_NALOGA}, function (data) {
-                console.log(data);
-            });
-        }
-
-        function Login() {
-            $.post("/api/Login", { username: $("#lgn_username").val(), password: $("#lgn_password").val() }, function (data) {
-                console.log(data);
-                if (data['result'] === "OK") {
-                    $("#output").text("ULOGOVAN");
-                    ACC_ID = parseInt(data['accID']);
-                    TIP_NALOGA = data['accType'];
-                } else if (data['result'] === "ERROR") {
-                    $("#output").text("GRESKA");
-                }
-            }, "json");
-        }
-
-    </script>
-    <h1>Test pocetna strana</h1>
-    <button onclick="GetSveZahtev();">Svi korisnici</button><br />
-
-    <input type="text" id="username" placeholder="korisnicko ime" /><br />
-    <input type="password" id="password" placeholder="sifra" /><br />
-    <input type="text" id="ime" placeholder="ime" /><br />
-    <input type="text" id="prezime" placeholder="prezime" /><br />
-    <button onclick="DodajKorisnika();">Dodaj korisnika</button><br /><br />
-
-    <input type="text" id="idKorisnika" />
-    <button onclick="GetJdng()">Prikazi korisnika</button>
-    <button onclick="Obrisi()">Obrisi korisnika</button>
-
-    <p>LOGIN</p>
-    <input type="text" id="lgn_username" placeholder="korisnicko ime" /><br />
-    <input type="password" id="lgn_password" placeholder="sifra" /><br />
-    <button onclick="Login()">Login</button><br />
-    <button onclick="PristupiZasticenomDelu()">Pristupi tajnim podacima</button>
-
-    <p>Poruka</p>
-    <p id="output"></p>
-</body>
+	<body>
+		<div class="col-12 header-container">
+			<div class="col-3 spacer spacerLeft"></div>
+			<div class="col-6 mainHeaderContainer">
+				<div class="col-3 spacer spacerLeft"></div>
+				<span class="logo col-6">Taksi služba - RUŽA</span>
+				<div class="col-3 spacer spacerRight"></div>
+			</div>
+			<div class="col-3 spacer spacerRight"></div>
+		</div>
+		<div class="col-12 main-container">
+			<div class="col-3 spacer spacerLeft"></div>
+			<div class="col-6 main">
+				<div class="col-3 spacer spacerLeft"></div>
+				<div class="loginFormContainer col-6">
+					<!--<form method="" action="" onsubmit='return ValidateForm();'>-->
+						<div class='usernameContainer'><span>Korisničko ime:</span></div>
+						<div><input id='lf-username' name='login_username' type='text'/></div>
+						<div class='passwordContainer'><span>Šifra:</span></div>
+						<div><input id='lf-password' name='login_sifra' type='password'/></div>
+						<div><button id='loginButton' type='submit'>Uloguj se</button></div>
+						<div><span id='openRegistartionForm'>Nemaš nalog?</span></div>
+					<!--</form>-->
+				</div>
+                <div style='display: none;' class="registerFormContainer col-6">
+                    <!--<form method="" action="" onsubmit='return ValidateForm();'>-->
+                    <table class='tejblRegister'>
+                        <tr>
+                            <td>Korisničko ime</td>
+                            <td><input id='rf-username' name='username' type='text' /></td>
+                        </tr>
+                        <tr>
+                            <td>Šifra</td>
+                            <td><input id='rf-sifra' name='sifra' type='password' /></td>
+                        </tr>
+                        <tr>
+                            <td>Ponovi šifru</td>
+                            <td><input id='sifra-rep' type='password' /></td>
+                        </tr>
+                        <tr>
+                            <td>E-mail</td>
+                            <td><input id='rf-email' name='email' type='email' /></td>
+                        </tr>
+                        <tr>
+                            <td>Ime</td>
+                            <td><input id='rf-ime' name='ime' type='text' /></td>
+                        </tr>
+                        <tr>
+                            <td>Prezime</td>
+                            <td><input id='rf-prezime' name='prezime' type='text' /></td>
+                        </tr>
+                        <tr>
+                            <td>JMBG</td>
+                            <td><input id='rf-jmbg' name='jmbg' type='text' /></td>
+                        </tr>
+                        <tr>
+                            <td>Telefon</td>
+                            <td><input id='rf-telefon' name='telefon' type='text' /></td>
+                        </tr>
+                        <tr>
+                            <td>Pol</td>
+                            <td><select id="pol" name='pol'><option value="M">M</option><option value="Z">Z</option></select></td>
+                        </tr>
+                    </table>
+                    <div><button id='registerButton' type='submit' onclick=''>Registruj se</button></div>
+                    <div><span id='openLoginForm'>Imaš nalog?</span></div>
+                    <!--</form>-->
+                </div>
+				<div class="col-3 spacer spacerRight"></div>
+			</div>
+			<div class="col-3 spacer spacerRight"></div>
+		</div>
+	</body>
 </html>

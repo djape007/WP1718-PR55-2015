@@ -13,17 +13,7 @@ namespace ProjekatWEB.Controllers
         [HttpGet]
         public JsonResult Get(int id, string tn_str)
         {
-            TipNaloga tn = TipNaloga.Musterija;
-            
-            if (tn_str == null || tn_str == "") {
-                return Json("VOJKO V NE MOZE");
-            } else if (tn_str == TipNaloga.Dispecer.ToString()) {
-                tn = TipNaloga.Dispecer;
-            } else if (tn_str == TipNaloga.Musterija.ToString()) {
-                tn = TipNaloga.Musterija;
-            } else if (tn_str == TipNaloga.Vozac.ToString()) {
-                tn = TipNaloga.Vozac;
-            }
+            TipNaloga tn = TipNalogaConvert.FromString(tn_str);
             
             if (Authorize.IsAllowedToAccess(id, tn, TipNaloga.Musterija)) {
                 return Json("uspeo");
