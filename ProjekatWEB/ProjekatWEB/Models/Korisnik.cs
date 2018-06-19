@@ -27,6 +27,7 @@ namespace ProjekatWEB
                 }
             }
         }
+
         public string Password { get; set; }
         public string Ime { get; set; }
         public string Prezime { get; set; }
@@ -44,6 +45,49 @@ namespace ProjekatWEB
                 brojacInstanci++;
                 ID = brojacInstanci;
             }
+        }
+
+        public static int GetIDFromToken(string b64token) {
+            var podaci = GetTokenData(b64token);
+            return int.Parse(podaci[1]);
+        }
+
+        public static string GetUsernameFromToken(string b64token) {
+            var podaci = GetTokenData(b64token);
+            return podaci[0];
+        }
+
+        public static TipNaloga GetTypeFromToken(string b64token) {
+            var podaci = GetTokenData(b64token);
+            return TipNalogaConvert.FromString(podaci[2]);
+        }
+
+        public static string[] GetTokenData(string b64token) {
+            string tokenNormal = "";
+            try {
+                tokenNormal = Helper.Base64Decode(b64token);
+            } catch {
+                return new string[0];
+            }
+
+            string[] podaci = tokenNormal.Split('|');
+
+            if (podaci.Length != 3) {
+                return new string[0];
+            }
+
+            return podaci;
+        }
+
+        public static String GenerateToken(Korisnik k) {
+            return k.Username + "|" + k.ID.ToString() + "|" + k.TipNaloga.ToString();
+        }
+
+        public static bool UsernameIsFree(string username) {
+            if (postojeciUsernameovi.Contains(username)) {
+                return false;
+            }
+            return true;
         }
     }
 }

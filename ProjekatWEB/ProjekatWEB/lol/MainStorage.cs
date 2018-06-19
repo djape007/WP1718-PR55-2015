@@ -73,6 +73,32 @@ namespace ProjekatWEB
             return k;
         }
 
+        public void UpdateKorisnika(Korisnik k) {
+            switch (k.TipNaloga) {
+                case TipNaloga.Dispecer:
+                    var d = dispeceri.Find(x => x.ID == k.ID);
+                    if (d != null) {
+                        dispeceri.Remove(d);
+                    }
+                    dispeceri.Add((Dispecer)k);
+                    break;
+                case TipNaloga.Musterija:
+                    var m = musterije.Find(x => x.ID == k.ID);
+                    if (m != null) {
+                        musterije.Remove(m);
+                    }
+                    musterije.Add((Musterija)k);
+                    break;
+                case TipNaloga.Vozac:
+                    var v = vozaci.Find(x => x.ID == k.ID);
+                    if (v != null) {
+                        vozaci.Remove(v);
+                    }
+                    vozaci.Add((Vozac)k);
+                    break;
+            }
+        }
+
         public Korisnik NadjiKorisnikaPoUsernameu(string username) {
             Korisnik k = null;
 

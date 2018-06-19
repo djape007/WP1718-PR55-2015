@@ -3,6 +3,7 @@ $(document).ready(function(){
 	    ToggleForme();
 	    e.preventDefault();
     });
+    
     $("#openRegistartionForm").click(function (e) {
 	    ToggleForme();
 	    e.preventDefault();
@@ -10,13 +11,34 @@ $(document).ready(function(){
 
     $("#loginButton").click(Login);
     $("#registerButton").click(Register);
+    
+    UcitajPodatkeIzKolaca();
+    ProveriAutoLogin();
 });
 
 var ACC_ID = -1;
 var ACC_TYPE = "";
 var ACC_USERNAME = "";
+var ACC_PASSW = "";
 var ACCESS_TOKEN = "";
 var DEFAULT_TIP_NALOGA = "Musterija";
+
+function UcitajPodatkeIzKolaca() {
+	ACC_ID = Cookies.get("accID");
+     ACC_TYPE = Cookies.get("accType");
+	ACC_USERNAME = Cookies.get("accUsername");
+	ACCESS_TOKEN = Cookies.get("access_token");
+	ACC_PASSW = Cookies.get("accPassw");
+}
+
+function ProveriAutoLogin() {
+	if (ACC_USERNAME != null && ACC_USERNAME !== "" && 
+		ACC_PASSW != null && ACC_PASSW !== "" &&
+		ACCESS_TOKEN != null && ACCESS_TOKEN !== "" &&
+		ACC_ID != null && ACC_TYPE != null) {
+		AjaxLoginZahtev(ACC_USERNAME, ACC_PASSW);
+	} 
+}
 
 function ToggleForme() {
 	if ($('body').hasClass('prikazanaRegistracija')) {
@@ -31,7 +53,7 @@ function ToggleForme() {
 
 function Login() {
     if (ValidateForm()) {
-        console.log("Sve je ispravno");
+        //console.log("Sve je ispravno");
         var korIme = $("#lf-username").val();
         var passw = $("#lf-password").val();
         AjaxLoginZahtev(korIme, passw);
@@ -40,7 +62,7 @@ function Login() {
 
 function Register() {
     if (ValidateForm()) {
-        console.log("Sve je ispravno");
+        //console.log("Sve je ispravno");
         var korIme = $("#rf-username").val();
         var passw = $("#rf-sifra").val();
         var email = $("#rf-email").val();
@@ -65,8 +87,9 @@ function AjaxLoginZahtev(korIme, sifra) {
             Cookies.set('accID', ACC_ID);
             Cookies.set('accType', ACC_TYPE);
             Cookies.set('accUsername', ACC_USERNAME);
+		  Cookies.set('accPassw', sifra);
             Cookies.set('access_token', ACCESS_TOKEN);
-
+		  window.location.href = "/Home/" + ACCESS_TOKEN;
         } else if (data['result'] === "ERROR") {
             DisplayError(data['message']);
         }

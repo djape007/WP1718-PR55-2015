@@ -10,5 +10,9 @@ namespace ProjekatWEB
         public double X { get; set; }
         public double Y { get; set; }
         public Adresa Adresa { get; set; }
+
+        public override string ToString() {
+            return "X: " + X.ToString() + " Y: " + Y.ToString() + " ADR:" + Adresa.ToString();  
+        }
     }
 }

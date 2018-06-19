@@ -20,7 +20,7 @@ namespace ProjekatWEB.Controllers
                 string accId = tmpTuple.Item2.ID.ToString();
                 string accType = tmpTuple.Item2.TipNaloga.ToString();
 
-                string tokenStr = korisnickoIme + "|" + accId + "|" + accType;
+                string tokenStr = Korisnik.GenerateToken(tmpTuple.Item2);
 
                 return Json(new Dictionary<string, string>() {
                     {"result", "OK"},

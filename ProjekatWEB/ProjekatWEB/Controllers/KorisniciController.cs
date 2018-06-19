@@ -4,72 +4,146 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using System.Configuration;
-using System.Data.SqlClient;
 
 namespace ProjekatWEB.Controllers
 {
     [Produces("application/json")]
     [Route("api/Korisnici")]
-    public class KorisniciController : Controller {
-        MainStorage ms = MainStorage.Instanca;
-        // GET: api/Korisnici
-        [HttpGet]
-        public JsonResult Get() {
-            List<Korisnik> v = new List<Korisnik>();
-            if (ms.Musterije.Count > 0) {
-                foreach (Korisnik k in ms.Musterije.Lista) {
-                    v.Add(k);
+    public class KorisniciController : Controller
+    {
+        [HttpGet("{id}/{token}")]
+        public JsonResult Get(int id, string token) {
+            if (id > 0 && token != null && Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer | TipNaloga.Musterija | TipNaloga.Vozac)) {
+                Korisnik k = MainStorage.Instanca.NadjiKorisnikaPoId(id);
+                return Json(k);
+            } else {
+                return Helper.ForbidenAccessJson();
+            }
+        }
+
+        [HttpGet("{token}")]
+        public JsonResult Get(string token) {
+            if (token != null && Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer)) {
+
+                Dictionary<string, object> vrati = new Dictionary<string, object>() {
+                    { "Musterije", MainStorage.Instanca.Musterije.Lista },
+                    {"Musterije", MainStorage.Instanca.Musterije.Lista },
+                    { "Dispeceri", MainStorage.Instanca.Dispeceri.Lista }
+                };
+
+                return Json(vrati);
+            } else {
+                return Helper.ForbidenAccessJson();
+            }
+        }
+
+        [HttpPut("{id}/{token}")]
+        public JsonResult Post(int id, string token, string username, string password, string pol, string email, string jmbg, string telefon, string ime, string prezime) {
+            if (token != null && Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer | TipNaloga.Musterija | TipNaloga.Vozac)) {
+                if (Korisnik.GetIDFromToken(token) != id) {
+                    return Json("ERROR_CANT_EDIT_OTHER_ACCOUNT_DATA");
+                }
+
+                Korisnik k = MainStorage.Instanca.NadjiKorisnikaPoId(id);
+                
+                if (k == null) {
+                    return Json("ERROR_ACCOUNT_DOES_NOT_EXIST");
+                }
+
+                if (!k.Username.Equals(username)) {
+                    if (!Validator.StringValidator(username, null, null, false, 4, 20)) {
+                        return Json("ERROR_USERNAME_NOT_CORRECT");
+                    } else if (!Korisnik.UsernameIsFree(username)) {
+                        return Json("ERROR_USERNAME_IN_USE");
+                    } else {
+                        k.Username = username;
+                    }
+                }
+
+                if (!k.Password.Equals(password)) {
+                    if (!Validator.StringValidator(password, null, null, false, 4, 35)) {
+                        return Json("ERROR_PASSWORD_NOT_CORRECT");
+                    } else {
+                        k.Password = password;
+                    }
+                }
+
+                if (!k.Ime.Equals(ime)) {
+                    if (!Validator.StringValidator(ime, null, null, false, 2, 25)) {
+                        return Json("ERROR_IME_NOT_CORRECT");
+                    } else {
+                        k.Ime = ime;
+                    }
+                }
+
+                if (!k.Prezime.Equals(prezime)) {
+                    if (!Validator.StringValidator(prezime, null, null, false, 2, 25)) {
+                        return Json("ERROR_PREZIME_NOT_CORRECT");
+                    } else {
+                        k.Prezime = prezime;
+                    }
+                }
+
+                if (!Validator.StringValidator(pol, null, null, false, 1, 1)) {
+                    return Json("ERROR_POL_NOT_CORRECT");
+                } else {
+                    k.Pol = (pol.Equals("M")) ? PolOsobe.Musko : PolOsobe.Zensko;
+                }
+
+                if (!k.Email.Equals(email)) {
+                    if (!Validator.StringValidator(email, new string[] { "@", "." }, null, false, 5, 50)) {
+                        return Json("ERROR_EMAIL_NOT_CORRECT");
+                    } else {
+                        k.Email = email;
+                    }
+                }
+
+                telefon = telefon.Replace("+", "");
+                telefon = telefon.Replace("-", "");
+                telefon = telefon.Replace("/", "");
+                telefon = telefon.Replace("  ", "");
+                telefon = telefon.Replace(" ", "");
+
+                if (!k.Telefon.Equals(telefon)) {
+                    if (!Validator.StringValidator(telefon, null, null, true, 5, 13)) {
+                        return Json("ERROR_PHONE_NOT_CORRECT");
+                    } else {
+                        k.Telefon = telefon;
+                    }
+                }
+
+                if (!k.JMBG.Equals(jmbg)) {
+                    if (!Validator.StringValidator(jmbg, null, null, true, 13, 13)) {
+                        return Json("ERROR_JMBG_NOT_CORRECT");
+                    } else {
+                        k.JMBG = jmbg;
+                    }
+                }
+
+                MainStorage.Instanca.UpdateKorisnika(k);
+                return Json("OK");
+            } else {
+                return Helper.ForbidenAccessJson();
+            }
+        }
+
+        [Route("[action]/{id}/{token}")]
+        public JsonResult Toggle(int id, string token) {
+            if (token != null && Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer)) {
+                if (id > 0) {
+                    Korisnik k = MainStorage.Instanca.NadjiKorisnikaPoId(id);
+                    if (k != null) {
+                        k.AktivanNalog = !k.AktivanNalog;
+                        MainStorage.Instanca.UpdateKorisnika(k);
+                        return Json("OK");
+                    } else {
+                        return Json("ERROR_ID_NOT_VALID");
+                    }
+                } else {
+                    return Json("ERROR_ID_NOT_VALID");
                 }
             } else {
-            }
-
-            return Json(v);
-        }
-
-        // GET: api/Korisnici/5
-        [HttpGet("{id}")]
-        public JsonResult Get(int id)
-        {
-
-            if (id >= 0 && id < ms.Musterije.Count) {
-                return Json(ms.Musterije.Lista[id]);
-            }
-
-            return Json(null);
-        }
-        
-        // POST: api/Korisnici
-        [HttpPost]
-        public JsonResult Post(string username, string password, string ime, string prezime)
-        {
-            if (username != null && password != null && ime != null && prezime != null && username.Trim() != "" && password.Trim() != "" && ime.Trim() != "" && prezime.Trim() != "") {
-                try {
-                    Musterija m = new Musterija() { Ime = ime, Username = username, Password = password, Prezime = prezime };
-                    ms.Musterije.Add(m);
-                    return Json("OK");
-                } catch {
-                    return Json("ERROR_USERNAME_EXISTS");
-                }
-            } else {
-                return Json("ERROR_FORM_NOT_COMPLETE");
-            }
-        }
-        
-        // PUT: api/Korisnici/5
-        [HttpPut("{id}")]
-        public void Put(int id, string value)
-        {
-
-        }
-
-        // DELETE: api/Korisnici/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-            if (ms.Musterije.Count > id) {
-                ms.Musterije.RemoveAt(id);
+                return Helper.ForbidenAccessJson();
             }
         }
     }

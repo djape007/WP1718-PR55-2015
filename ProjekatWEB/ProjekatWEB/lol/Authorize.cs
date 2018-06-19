@@ -17,16 +17,9 @@ namespace ProjekatWEB
         }
 
         public static bool IsAllowedToAccess(string b64token, TipNaloga potrebanTip) {
-            string tokenNormal = "";
-            try {
-                tokenNormal = Helper.Base64Decode(b64token);
-            } catch {
-                return false;
-            }
+            string[] podaci = Korisnik.GetTokenData(b64token);
 
-            string[] podaci = tokenNormal.Split('|');
-
-            if (podaci.Length != 3) {
+            if (podaci.Length == 0) {
                 return false;
             }
 
@@ -42,6 +35,35 @@ namespace ProjekatWEB
         public static Dictionary<int, TipNaloga> PotvrdjeniNalozi {
             get { return potvrdjeni; }
             set { potvrdjeni = value; }
+        }
+
+        public static void RemoveAllAccess(int accId) {
+            if (PotvrdjeniNalozi.ContainsKey(accId)) {
+                PotvrdjeniNalozi.Remove(accId);
+            }
+        }
+
+        public static void RemoveAllAccess(string b64token) {
+            string tokenNormal = "";
+            try {
+                tokenNormal = Helper.Base64Decode(b64token);
+            } catch {
+                return;
+            }
+
+            string[] podaci = tokenNormal.Split('|');
+
+            if (podaci.Length != 3) {
+                return;
+            }
+
+            try {
+                int accId = int.Parse(podaci[1]);
+                RemoveAllAccess(accId);
+                return;
+            } catch {
+                return;
+            }
         }
     }
 }

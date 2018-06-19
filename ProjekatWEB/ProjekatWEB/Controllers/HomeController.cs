@@ -12,14 +12,10 @@ namespace ProjekatWEB.Controllers
     [Route("home.html")]
     public class HomeController : Controller
     {
-        [HttpGet]
+        [HttpGet("{token?}")]
         public ContentResult Get(string token) {
             if (token == null) {
-                return new ContentResult {
-                    ContentType = "text/html",
-                    StatusCode = (int)System.Net.HttpStatusCode.Forbidden,
-                    Content = ""
-                };
+                return Helper.ForbidenAccess();
             } else if (Authorize.IsAllowedToAccess(token, TipNaloga.Musterija | TipNaloga.Dispecer | TipNaloga.Vozac)) {
                 string sadrzajFajla = "";
 
@@ -33,11 +29,7 @@ namespace ProjekatWEB.Controllers
                     Content = sadrzajFajla
                 };
             } else {
-                return new ContentResult {
-                    ContentType = "text/html",
-                    StatusCode = (int)System.Net.HttpStatusCode.Forbidden,
-                    Content = ""
-                };
+                return Helper.ForbidenAccess();
             }
         }
     }
