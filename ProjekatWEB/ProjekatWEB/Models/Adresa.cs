@@ -10,7 +10,7 @@ namespace ProjekatWEB
         public string Ulica { get; set; }
         public string Broj { get; set; }
         public string Mesto { get; set; }
-        public int PozivniBroj { get; set; }
+        public string PozivniBroj { get; set; }
 
         public override string ToString() {
             return Ulica + " " + Broj + ", " + Mesto + " " + PozivniBroj;

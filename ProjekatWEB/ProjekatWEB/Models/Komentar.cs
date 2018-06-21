@@ -12,8 +12,8 @@ namespace ProjekatWEB
         public int ID { get; set; }
         public string Opis { get; set; }
         public DateTime DatumObjave { get; set; }
-        public Korisnik Autor { get; set; }
-        public Voznja Voznja { get; set; }
+        public int Autor { get; set; }
+        public int Voznja { get; set; }
         public int OcenaVoznje { get; set; }
 
         public Komentar(int id = -1) {

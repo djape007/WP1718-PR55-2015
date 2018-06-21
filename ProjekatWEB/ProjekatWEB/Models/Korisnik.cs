@@ -19,11 +19,11 @@ namespace ProjekatWEB
                 return username;
             }
             set {
-                if (postojeciUsernameovi.Contains(value)) {
+                if (postojeciUsernameovi.Contains(value.ToLower())) {
                     throw new Exception(value + " je zauzeto");
                 } else {
-                    username = value;
-                    postojeciUsernameovi.Add(value);
+                    username = value.ToLower();
+                    postojeciUsernameovi.Add(value.ToLower());
                 }
             }
         }
@@ -59,7 +59,7 @@ namespace ProjekatWEB
 
         public static TipNaloga GetTypeFromToken(string b64token) {
             var podaci = GetTokenData(b64token);
-            return TipNalogaConvert.FromString(podaci[2]);
+            return Helper.TipNalogaFromString(podaci[2]);
         }
 
         public static string[] GetTokenData(string b64token) {
@@ -84,10 +84,16 @@ namespace ProjekatWEB
         }
 
         public static bool UsernameIsFree(string username) {
-            if (postojeciUsernameovi.Contains(username)) {
+            if (postojeciUsernameovi.Contains(username.ToLower())) {
                 return false;
             }
             return true;
+        }
+
+        public static void RemoveUsernameInUse(string username) {
+            if (postojeciUsernameovi.Contains(username.ToLower())) {
+                postojeciUsernameovi.Remove(username.ToLower());
+            }
         }
     }
 }

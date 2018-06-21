@@ -17,8 +17,9 @@ namespace ProjekatWEB
         public int DispecerID { get; set; }
         public int VozacID { get; set; }
         public double Iznos { get; set; }
-        public Komentar Komentar { get; set; }
+        public List<int> KomentarID { get; set; }
         public StatusVoznje Status { get; set; }
+        public TipVoznje TipVoznje { get; set; }
 
         public Voznja(int id = -1, bool postaviDatum = false) {
             if (id == -1) {
