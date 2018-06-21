@@ -35,12 +35,29 @@ namespace ProjekatWEB.Controllers
             if (Authorize.IsAllowedToAccess(token, TipNaloga.Vozac | TipNaloga.Dispecer)) {
                 Automobil a = null;
                 try {
+
+                    Vozac v = null;
+                    if (idVozaca > 0) {
+                        v = MainStorage.Instanca.Vozaci.FirstOrDefault(x => x.ID == idVozaca);
+                        if (v == null) {
+                            return Json("ERROR_DRIVER_DOES_NOT_EXIST");
+                        } else if (v.Automobil != "") {
+                            return Json("ERROR_DRIVER_ALREADY_HAS_A_CAR");
+                        }
+                    }
+
                     a = new Automobil() {
                         BrojVozila = brojVozila,
                         GodisteAutomobila = godiste,
                         TipAutomobila = Helper.TipAutomobilaFromString(tip),
                         VozacID = idVozaca
                     };
+
+                    //automobil je uspesno napravljen, updateujem podatke vozaca
+                    v.Automobil = a.BrojVozila;
+                    MainStorage.Instanca.Automobili.Add(a);
+                    MainStorage.Instanca.UpdateKorisnika(v);
+
                     return Json("OK_" + a.BrojVozila);
                 } catch {
                     return Json("ERROR_DATA_NOT_CORRECT_OR_MISSING");
