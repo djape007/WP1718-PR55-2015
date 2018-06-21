@@ -102,7 +102,7 @@ namespace ProjekatWEB.Controllers
                         return Json("ERROR_COMMENT_ID_DOES_NOT_EXIST");
                     }
                 } else {
-                    return Json("ERROR_DRIVE_ID_DOES_NOT_EXIST");
+                    return Json("ERROR_RIDE_ID_DOES_NOT_EXIST");
                 }
             } else {
                 return Helper.ForbidenAccessJson();
@@ -123,7 +123,7 @@ namespace ProjekatWEB.Controllers
                         return Json("ERROR_DRIVER_ID_DOES_NOT_EXIST");
                     }
                 } else {
-                    return Json("ERROR_DRIVE_ID_DOES_NOT_EXIST");
+                    return Json("ERROR_RIDE_ID_DOES_NOT_EXIST");
                 }
             } else {
                 return Helper.ForbidenAccessJson();
@@ -144,7 +144,7 @@ namespace ProjekatWEB.Controllers
                         return Json("ERROR_DISPATCHER_ID_DOES_NOT_EXIST");
                     }
                 } else {
-                    return Json("ERROR_DRIVE_ID_DOES_NOT_EXIST");
+                    return Json("ERROR_RIDE_ID_DOES_NOT_EXIST");
                 }
             } else {
                 return Helper.ForbidenAccessJson();
@@ -165,7 +165,7 @@ namespace ProjekatWEB.Controllers
                         return Json("ERROR_DRIVE_STATUS_NOT_CORRECT");
                     }
                 } else {
-                    return Json("ERROR_DRIVE_ID_DOES_NOT_EXIST");
+                    return Json("ERROR_RIDE_ID_DOES_NOT_EXIST");
                 }
             } else {
                 return Helper.ForbidenAccessJson();
@@ -186,7 +186,7 @@ namespace ProjekatWEB.Controllers
                         return Json("ERROR_LOCATION_JSON_FORMAT_NOT_CORRECT");
                     }
                 } else {
-                    return Json("ERROR_DRIVE_ID_DOES_NOT_EXIST");
+                    return Json("ERROR_RIDE_ID_DOES_NOT_EXIST");
                 }
             } else {
                 return Helper.ForbidenAccessJson();
@@ -204,10 +204,10 @@ namespace ProjekatWEB.Controllers
                         MainStorage.Instanca.UpdateVoznju(tmpV);
                         return Json("OK");
                     } catch {
-                        return Json("ERROR_DRIVE_TYPE_NOT_CORRECT");
+                        return Json("ERROR_RIDE_TYPE_NOT_CORRECT");
                     }
                 } else {
-                    return Json("ERROR_DRIVE_ID_DOES_NOT_EXIST");
+                    return Json("ERROR_RIDE_ID_DOES_NOT_EXIST");
                 }
             } else {
                 return Helper.ForbidenAccessJson();
