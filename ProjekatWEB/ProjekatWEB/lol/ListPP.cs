@@ -42,6 +42,12 @@ namespace ProjekatWEB
             SacuvajNaHDD();
         }
 
+        public void Replace(T old, T _new) {
+            l.Remove(old);
+            l.Add(_new);
+            SacuvajNaHDD();
+        }
+
         public void RemoveAll(Predicate<T> predicate) {
             l.RemoveAll(predicate);
             SacuvajNaHDD();
@@ -63,6 +69,10 @@ namespace ProjekatWEB
         public void ForEach(Action<T> action) {
             l.ForEach(action);
             SacuvajNaHDD();
+        }
+
+        public T FirstOrDefault(Func<T, bool> predicate) {
+            return l.FirstOrDefault(predicate);
         }
         
         public IEnumerable<T> Where(Func<T, bool> func) {

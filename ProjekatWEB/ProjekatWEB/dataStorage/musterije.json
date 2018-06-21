@@ -25,6 +25,6 @@
     "Email": "test@test.com",
     "TipVoznje": 0,
     "TipNaloga": 1,
-    "AktivanNalog": true
+    "AktivanNalog": false
   }
 ]

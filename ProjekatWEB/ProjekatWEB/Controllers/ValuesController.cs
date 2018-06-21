@@ -13,7 +13,7 @@ namespace ProjekatWEB.Controllers
         [HttpGet]
         public JsonResult Get(int id, string tn_str)
         {
-            TipNaloga tn = TipNalogaConvert.FromString(tn_str);
+            TipNaloga tn = Helper.TipNalogaFromString(tn_str);
             
             if (Authorize.IsAllowedToAccess(id, tn, TipNaloga.Musterija)) {
                 return Json("uspeo");

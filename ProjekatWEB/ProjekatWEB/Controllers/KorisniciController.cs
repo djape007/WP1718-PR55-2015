@@ -13,7 +13,7 @@ namespace ProjekatWEB.Controllers
     {
         [HttpGet("{id}/{token}")]
         public JsonResult Get(int id, string token) {
-            if (id > 0 && token != null && Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer | TipNaloga.Musterija | TipNaloga.Vozac)) {
+            if (id > 0 && Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer | TipNaloga.Musterija | TipNaloga.Vozac)) {
                 Korisnik k = MainStorage.Instanca.NadjiKorisnikaPoId(id);
                 return Json(k);
             } else {
@@ -23,11 +23,11 @@ namespace ProjekatWEB.Controllers
 
         [HttpGet("{token}")]
         public JsonResult Get(string token) {
-            if (token != null && Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer)) {
+            if (Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer)) {
 
                 Dictionary<string, object> vrati = new Dictionary<string, object>() {
                     { "Musterije", MainStorage.Instanca.Musterije.Lista },
-                    {"Musterije", MainStorage.Instanca.Musterije.Lista },
+                    { "Vozaci", MainStorage.Instanca.Vozaci.Lista },
                     { "Dispeceri", MainStorage.Instanca.Dispeceri.Lista }
                 };
 
@@ -37,9 +37,9 @@ namespace ProjekatWEB.Controllers
             }
         }
 
-        [HttpPut("{id}/{token}")]
+        [HttpPost("{id}/{token}")]
         public JsonResult Post(int id, string token, string username, string password, string pol, string email, string jmbg, string telefon, string ime, string prezime) {
-            if (token != null && Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer | TipNaloga.Musterija | TipNaloga.Vozac)) {
+            if (Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer | TipNaloga.Musterija | TipNaloga.Vozac)) {
                 if (Korisnik.GetIDFromToken(token) != id) {
                     return Json("ERROR_CANT_EDIT_OTHER_ACCOUNT_DATA");
                 }
@@ -56,6 +56,7 @@ namespace ProjekatWEB.Controllers
                     } else if (!Korisnik.UsernameIsFree(username)) {
                         return Json("ERROR_USERNAME_IN_USE");
                     } else {
+                        Korisnik.RemoveUsernameInUse(k.Username);
                         k.Username = username;
                     }
                 }
@@ -129,7 +130,7 @@ namespace ProjekatWEB.Controllers
 
         [Route("[action]/{id}/{token}")]
         public JsonResult Toggle(int id, string token) {
-            if (token != null && Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer)) {
+            if (Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer)) {
                 if (id > 0) {
                     Korisnik k = MainStorage.Instanca.NadjiKorisnikaPoId(id);
                     if (k != null) {

@@ -53,7 +53,7 @@ namespace ProjekatWEB.Controllers
                 return Json("ERROR_JMBG_NOT_CORRECT");
             }
 
-            TipNaloga tipNaloga = TipNalogaConvert.FromString(tipNaloga_str);
+            TipNaloga tipNaloga = Helper.TipNalogaFromString(tipNaloga_str);
 
             switch (tipNaloga) {
                 case TipNaloga.Musterija:

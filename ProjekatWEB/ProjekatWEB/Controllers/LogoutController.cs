@@ -13,7 +13,7 @@ namespace ProjekatWEB.Controllers
     {
         [HttpGet("{token}")]
         public JsonResult Logout(string token) {
-            if (token != null && Authorize.IsAllowedToAccess(token, TipNaloga.Musterija | TipNaloga.Vozac | TipNaloga.Dispecer)) {
+            if (Authorize.IsAllowedToAccess(token, TipNaloga.Musterija | TipNaloga.Vozac | TipNaloga.Dispecer)) {
                 Authorize.RemoveAllAccess(token);
                 return Json("OK");
             } else {

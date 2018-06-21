@@ -15,12 +15,16 @@ namespace ProjekatWEB
         private ListPP<Vozac> vozaci;
         private ListPP<Voznja> voznje;
         private ListPP<Dispecer> dispeceri;
+        private ListPP<Komentar> komentari;
+        private ListPP<Automobil> automobili;
 
         private MainStorage() {
             musterije = new ListPP<Musterija>(Lokacija + "musterije.json");
             vozaci = new ListPP<Vozac>(Lokacija + "vozaci.json");
             voznje = new ListPP<Voznja>(Lokacija + "voznje.json");
             dispeceri = new ListPP<Dispecer>(Lokacija + "dispeceri.json");
+            komentari = new ListPP<Komentar>(Lokacija + "komentari.json");
+            automobili = new ListPP<Automobil>(Lokacija + "automobili.json");
         }
 
         public static MainStorage Instanca {
@@ -41,33 +45,20 @@ namespace ProjekatWEB
         public ListPP<Vozac> Vozaci { get => vozaci; set => vozaci = value; }
         public ListPP<Voznja> Voznje { get => voznje; set => voznje = value; }
         public ListPP<Dispecer> Dispeceri { get => dispeceri; set => dispeceri = value; }
+        public ListPP<Komentar> Komentari { get => komentari; set => komentari = value; }
+        public ListPP<Automobil> Automobili { get => automobili; set => automobili = value; }
 
         public Korisnik NadjiKorisnikaPoId(int id) {
             Korisnik k = null;
+            
+            k = musterije.FirstOrDefault(x => x.ID == id);
 
-            foreach(Musterija m in musterije.Lista) {
-                if (m.ID == id) {
-                    k = m;
-                    break;
-                }
+            if (k == null) {
+                k = vozaci.FirstOrDefault(x => x.ID == id);
             }
 
             if (k == null) {
-                foreach (Vozac v in vozaci.Lista) {
-                    if (v.ID == id) {
-                        k = v;
-                        break;
-                    }
-                }
-            }
-
-            if (k == null) {
-                foreach (Dispecer d in dispeceri.Lista) {
-                    if (d.ID == id) {
-                        k = d;
-                        break;
-                    }
-                }
+                k = dispeceri.FirstOrDefault(x => x.ID == id);
             }
 
             return k;
@@ -76,21 +67,21 @@ namespace ProjekatWEB
         public void UpdateKorisnika(Korisnik k) {
             switch (k.TipNaloga) {
                 case TipNaloga.Dispecer:
-                    var d = dispeceri.Find(x => x.ID == k.ID);
+                    var d = dispeceri.FirstOrDefault(x => x.ID == k.ID);
                     if (d != null) {
                         dispeceri.Remove(d);
                     }
                     dispeceri.Add((Dispecer)k);
                     break;
                 case TipNaloga.Musterija:
-                    var m = musterije.Find(x => x.ID == k.ID);
+                    var m = musterije.FirstOrDefault(x => x.ID == k.ID);
                     if (m != null) {
                         musterije.Remove(m);
                     }
                     musterije.Add((Musterija)k);
                     break;
                 case TipNaloga.Vozac:
-                    var v = vozaci.Find(x => x.ID == k.ID);
+                    var v = vozaci.FirstOrDefault(x => x.ID == k.ID);
                     if (v != null) {
                         vozaci.Remove(v);
                     }
@@ -99,32 +90,38 @@ namespace ProjekatWEB
             }
         }
 
+        public void UpdateVoznju(Voznja v) {
+            var vOld = Voznje.FirstOrDefault(x => x.ID == v.ID);
+            if (vOld != null) {
+                Voznje.Replace(vOld, v);
+            }
+        }
+
+        public void UpdateAutomobil(Automobil a) {
+            var vOld = Automobili.FirstOrDefault(x => x.BrojVozila == a.BrojVozila);
+            if (vOld != null) {
+                Automobili.Replace(vOld, a);
+            }
+        }
+
+        public void UpdateKomentar(Komentar k) {
+            var oldKom = Komentari.FirstOrDefault(x => x.ID == k.ID);
+            if (oldKom != null) {
+                Komentari.Replace(oldKom, k);
+            }
+        }
+
         public Korisnik NadjiKorisnikaPoUsernameu(string username) {
             Korisnik k = null;
+            
+            k = musterije.FirstOrDefault(x => x.Username.ToLower() == username.ToLower());
 
-            foreach (Musterija m in musterije.Lista) {
-                if (m.Username == username) {
-                    k = m;
-                    break;
-                }
+            if (k == null) {
+                k = vozaci.FirstOrDefault(x => x.Username.ToLower() == username.ToLower());
             }
 
             if (k == null) {
-                foreach (Vozac v in vozaci.Lista) {
-                    if (v.Username == username) {
-                        k = v;
-                        break;
-                    }
-                }
-            }
-
-            if (k == null) {
-                foreach (Dispecer d in dispeceri.Lista) {
-                    if (d.Username == username) {
-                        k = d;
-                        break;
-                    }
-                }
+                k = dispeceri.FirstOrDefault(x => x.Username.ToLower() == username.ToLower());
             }
 
             return k;

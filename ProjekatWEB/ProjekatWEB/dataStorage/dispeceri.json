@@ -1,19 +1,5 @@
 ﻿[
   {
-    "ID": 1,
-    "Username": "admin",
-    "Password": "admin",
-    "Ime": "Adam",
-    "Prezime": "Adminic",
-    "Pol": 1,
-    "JMBG": "1234567890123",
-    "Telefon": "1237587",
-    "Email": "admin@kvote.rs",
-    "TipVoznje": 0,
-    "TipNaloga": 4,
-    "AktivanNalog": true
-  },
-  {
     "ID": 2,
     "Username": "dispecer",
     "Password": "dispecer",
@@ -23,6 +9,20 @@
     "JMBG": "5432167890321",
     "Telefon": "998877663",
     "Email": "dispecer@kvote.rs",
+    "TipVoznje": 0,
+    "TipNaloga": 4,
+    "AktivanNalog": true
+  },
+  {
+    "ID": 1,
+    "Username": "admin",
+    "Password": "admin",
+    "Ime": "Adam",
+    "Prezime": "Adminic",
+    "Pol": 1,
+    "JMBG": "1234567890123",
+    "Telefon": "123758722",
+    "Email": "admin@kvote.rs",
     "TipVoznje": 0,
     "TipNaloga": 4,
     "AktivanNalog": true

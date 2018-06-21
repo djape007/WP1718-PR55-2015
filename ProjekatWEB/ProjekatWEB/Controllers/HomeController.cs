@@ -14,9 +14,7 @@ namespace ProjekatWEB.Controllers
     {
         [HttpGet("{token?}")]
         public ContentResult Get(string token) {
-            if (token == null) {
-                return Helper.ForbidenAccess();
-            } else if (Authorize.IsAllowedToAccess(token, TipNaloga.Musterija | TipNaloga.Dispecer | TipNaloga.Vozac)) {
+            if (Authorize.IsAllowedToAccess(token, TipNaloga.Musterija | TipNaloga.Dispecer | TipNaloga.Vozac)) {
                 string sadrzajFajla = "";
 
                 using (System.IO.StreamReader sr = new System.IO.StreamReader("wwwroot/home.html")) {

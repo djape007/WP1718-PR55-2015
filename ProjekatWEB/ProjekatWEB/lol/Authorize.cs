@@ -17,6 +17,10 @@ namespace ProjekatWEB
         }
 
         public static bool IsAllowedToAccess(string b64token, TipNaloga potrebanTip) {
+            if (b64token == null) {
+                return false;
+            }
+
             string[] podaci = Korisnik.GetTokenData(b64token);
 
             if (podaci.Length == 0) {
@@ -25,7 +29,7 @@ namespace ProjekatWEB
 
             try {
                 int accId = int.Parse(podaci[1]);
-                TipNaloga tp = TipNalogaConvert.FromString(podaci[2]);
+                TipNaloga tp = Helper.TipNalogaFromString(podaci[2]);
                 return IsAllowedToAccess(accId, tp, potrebanTip);
             } catch {
                 return false;
