@@ -16,10 +16,14 @@ namespace ProjekatWEB
         public int Voznja { get; set; }
         public int OcenaVoznje { get; set; }
 
-        public Komentar(int id = -1) {
+        public Komentar(int id = -1, bool postaviDatum = false) {
             if (id == -1) {
                 brojacInstanci++;
                 ID = brojacInstanci;
+            }
+
+            if (postaviDatum) {
+                DatumObjave = DateTime.Now;
             }
         }
     }

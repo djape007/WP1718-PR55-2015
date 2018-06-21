@@ -1,0 +1,18 @@
+﻿[
+  {
+    "ID": 2,
+    "Opis": "odlican voznja",
+    "DatumObjave": "2018-06-21T17:05:21.3352835+02:00",
+    "Autor": 3,
+    "Voznja": 2,
+    "OcenaVoznje": 0
+  },
+  {
+    "ID": 3,
+    "Opis": "odlican voznja!!!!",
+    "DatumObjave": "2018-06-21T17:05:31.6054336+02:00",
+    "Autor": 3,
+    "Voznja": 2,
+    "OcenaVoznje": 2
+  }
+]

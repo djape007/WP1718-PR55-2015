@@ -1,7 +1,7 @@
 ﻿[
   {
     "TrenutnaLokacija": null,
-    "Automobil": null,
+    "Automobil": "",
     "ID": 3,
     "Username": "vozac",
     "Password": "vozac",

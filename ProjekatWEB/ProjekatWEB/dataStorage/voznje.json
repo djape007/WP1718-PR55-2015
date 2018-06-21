@@ -1,0 +1,95 @@
+﻿[
+  {
+    "ID": 1,
+    "DatumNarucivanja": "2018-06-21T17:02:05.3916795+02:00",
+    "PocetnaLokacija": {
+      "X": 4.0,
+      "Y": 5.0,
+      "Adresa": {
+        "Ulica": "Svetosavska",
+        "Broj": "5b",
+        "Mesto": "Novi Sad",
+        "PozivniBroj": "21000"
+      }
+    },
+    "MusterijaID": 4,
+    "Odrediste": {
+      "X": 2.0,
+      "Y": 9.0,
+      "Adresa": {
+        "Ulica": "Svetosavska",
+        "Broj": "15b",
+        "Mesto": "Novi Sad",
+        "PozivniBroj": "21000"
+      }
+    },
+    "DispecerID": 2,
+    "VozacID": 3,
+    "Iznos": 6.7082039324993694,
+    "KomentarID": [],
+    "Status": 2,
+    "TipVoznje": 0
+  },
+  {
+    "ID": 2,
+    "DatumNarucivanja": "2018-06-21T17:02:07.2721142+02:00",
+    "PocetnaLokacija": {
+      "X": 4.0,
+      "Y": 5.0,
+      "Adresa": {
+        "Ulica": "Svetosavska",
+        "Broj": "5b",
+        "Mesto": "Novi Sad",
+        "PozivniBroj": "21000"
+      }
+    },
+    "MusterijaID": 4,
+    "Odrediste": {
+      "X": 2.0,
+      "Y": 9.0,
+      "Adresa": {
+        "Ulica": "Svetosavska",
+        "Broj": "15b",
+        "Mesto": "Novi Sad",
+        "PozivniBroj": "21000"
+      }
+    },
+    "DispecerID": 2,
+    "VozacID": 3,
+    "Iznos": 6.7082039324993694,
+    "KomentarID": [],
+    "Status": 2,
+    "TipVoznje": 0
+  },
+  {
+    "ID": 3,
+    "DatumNarucivanja": "2018-06-21T17:02:18.8741336+02:00",
+    "PocetnaLokacija": {
+      "X": 4.0,
+      "Y": 5.0,
+      "Adresa": {
+        "Ulica": "Svetosavska",
+        "Broj": "5b",
+        "Mesto": "Novi Sad",
+        "PozivniBroj": "21000"
+      }
+    },
+    "MusterijaID": 4,
+    "Odrediste": {
+      "X": 2.0,
+      "Y": 9.0,
+      "Adresa": {
+        "Ulica": "Svetosavska",
+        "Broj": "15b",
+        "Mesto": "Novi Sad",
+        "PozivniBroj": "21000"
+      }
+    },
+    "DispecerID": 2,
+    "VozacID": 1,
+    "Iznos": 6.7082039324993694,
+    "KomentarID": [],
+    "Status": 2,
+    "TipVoznje": 0
+  }
+]
