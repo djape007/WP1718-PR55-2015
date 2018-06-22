@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace ProjekatWEB.Controllers
 {
@@ -149,7 +150,33 @@ namespace ProjekatWEB.Controllers
                     if (k != null) {
                         k.AktivanNalog = !k.AktivanNalog;
                         MainStorage.Instanca.UpdateKorisnika(k);
-                        return Json("OK");
+                        return Json("OK_" + k.AktivanNalog.ToString());
+                    } else {
+                        return Json("ERROR_ID_NOT_VALID");
+                    }
+                } else {
+                    return Json("ERROR_ID_NOT_VALID");
+                }
+            } else {
+                return Helper.ForbidenAccessJson();
+            }
+        }
+
+        [HttpPost("[action]/{token}")]
+        public JsonResult SetLocation(string token, string JSONLokacija) {
+            if (Authorize.IsAllowedToAccess(token, TipNaloga.Vozac)) {
+                int id = Korisnik.GetIDFromToken(token);
+                if (id > 0) {
+                    Vozac k = MainStorage.Instanca.Vozaci.FirstOrDefault(x => x.ID == id);
+                    if (k != null) {
+                        try {
+                            Lokacija lok = JsonConvert.DeserializeObject<Lokacija>(JSONLokacija);
+                            k.TrenutnaLokacija = lok;
+                            MainStorage.Instanca.UpdateKorisnika(k);
+                            return Json("OK");
+                        } catch {
+                            return Json("ERROR_JSON_LOCATION_FORMAT_NOT_CORRECT");
+                        }
                     } else {
                         return Json("ERROR_ID_NOT_VALID");
                     }

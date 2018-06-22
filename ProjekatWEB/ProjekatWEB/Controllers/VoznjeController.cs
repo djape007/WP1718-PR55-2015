@@ -35,6 +35,66 @@ namespace ProjekatWEB.Controllers
             }
         }
 
+        [HttpGet("[action]/{id}/{token}")]
+        public JsonResult WhereCustomer(int id, string token) {
+            if (Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer | TipNaloga.Vozac | TipNaloga.Musterija)) {
+                if (id >= 0) {
+                    var musterija = MainStorage.Instanca.Musterije.FirstOrDefault(x => x.ID == id);
+                    if (musterija == null) {
+                        return Json("ERROR_CUSTOMER_DOES_NOT_EXIST");
+                    }
+
+                    List<Voznja> voznje = MainStorage.Instanca.Voznje.FindAll(x => x.MusterijaID == id);
+
+                    return Json(voznje);
+                } else {
+                    return Json(null);
+                }
+            } else {
+                return Helper.ForbidenAccessJson();
+            }
+        }
+
+        [HttpGet("[action]/{id}/{token}")]
+        public JsonResult WhereDriver(int id, string token) {
+            if (Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer | TipNaloga.Vozac)) {
+                if (id >= 0) {
+                    var vozac = MainStorage.Instanca.Vozaci.FirstOrDefault(x => x.ID == id);
+                    if (vozac == null) {
+                        return Json("ERROR_DRIVER_DOES_NOT_EXIST");
+                    }
+
+                    List<Voznja> voznje = MainStorage.Instanca.Voznje.FindAll(x => x.VozacID == id);
+
+                    return Json(voznje);
+                } else {
+                    return Json(null);
+                }
+            } else {
+                return Helper.ForbidenAccessJson();
+            }
+        }
+
+        [HttpGet("[action]/{id}/{token}")]
+        public JsonResult WhereDispatcher(int id, string token) {
+            if (Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer | TipNaloga.Vozac)) {
+                if (id >= 0) {
+                    var dispecer = MainStorage.Instanca.Dispeceri.FirstOrDefault(x => x.ID == id);
+                    if (dispecer == null) {
+                        return Json("ERROR_DISPATCHER_DOES_NOT_EXIST");
+                    }
+
+                    List<Voznja> voznje = MainStorage.Instanca.Voznje.FindAll(x => x.DispecerID == id);
+
+                    return Json(voznje);
+                } else {
+                    return Json(null);
+                }
+            } else {
+                return Helper.ForbidenAccessJson();
+            }
+        }
+
         [HttpPost("{token}")]
         public JsonResult Post(string token, string pocetnaLokacijaJSON, string krajnjaLokacijaJSON, int musterijaId = -1, int dispecerId = -1,int vozacId = -1) {
             if (Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer | TipNaloga.Vozac | TipNaloga.Musterija)) {
@@ -69,12 +129,18 @@ namespace ProjekatWEB.Controllers
                     return Json("ERROR_DISPATCHER_ID_NOT_VALID");
                 }
 
+                var statusVoznje = ProjekatWEB.StatusVoznje.Kreirana;
+                TipNaloga tipNaloga = Korisnik.GetTypeFromToken(token);
+                if (tipNaloga == TipNaloga.Dispecer) {
+                    statusVoznje = StatusVoznje.Formirana;
+                }
+
                 Voznja v = new Voznja(postaviDatum: true) {
                     KomentarID = new List<int>(),
                     VozacID = vozacId,
                     MusterijaID = musterijaId,
                     DispecerID = dispecerId,
-                    Status = ProjekatWEB.StatusVoznje.Formirana,
+                    Status = statusVoznje,
                     PocetnaLokacija = pocetak,
                     Odrediste = kraj,
                     Iznos = (kraj != null) ? Helper.IzracunajCenuVoznje(pocetak, kraj) : -1

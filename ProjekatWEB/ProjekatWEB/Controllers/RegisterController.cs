@@ -8,13 +8,13 @@ using Microsoft.AspNetCore.Mvc;
 namespace ProjekatWEB.Controllers
 {
     [Produces("application/json")]
-    [Route("api/Register")]
+    [Route("api/Register/{token?}")]
     public class RegisterController : Controller
     {
         MainStorage ms = MainStorage.Instanca;
 
         [HttpPost]
-        public JsonResult Post(string username, string password, string ime, string prezime, string pol, string email, string telefon, string jmbg, string tipNaloga_str) {
+        public JsonResult Post(string username, string password, string ime, string prezime, string pol, string email, string telefon, string jmbg, string tipNaloga_str, string token) {
             
             if (!Validator.StringValidator(username, null, null, false, 4, 20)) {
                 return Json("ERROR_USERNAME_NOT_CORRECT");
@@ -76,38 +76,46 @@ namespace ProjekatWEB.Controllers
                     }
 
                 case TipNaloga.Dispecer:
-                    try {
-                        Dispecer d = new Dispecer() {
-                            Username = username,
-                            Password = password,
-                            Ime = ime,
-                            Prezime = prezime,
-                            Email = email,
-                            JMBG = jmbg,
-                            Telefon = telefon,
-                            Pol = (pol == "M") ? PolOsobe.Musko : PolOsobe.Zensko
-                        };
-                        ms.Dispeceri.Add(d);
-                        return Json("OK");
-                    } catch {
-                        return Json("ERROR_USERNAME_EXISTS");
+                    if (Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer)) {
+                        try {
+                            Dispecer d = new Dispecer() {
+                                Username = username,
+                                Password = password,
+                                Ime = ime,
+                                Prezime = prezime,
+                                Email = email,
+                                JMBG = jmbg,
+                                Telefon = telefon,
+                                Pol = (pol == "M") ? PolOsobe.Musko : PolOsobe.Zensko
+                            };
+                            ms.Dispeceri.Add(d);
+                            return Json("OK");
+                        } catch {
+                            return Json("ERROR_USERNAME_EXISTS");
+                        }
+                    } else {
+                        return Json("ERROR_NOT_ALLOWED");
                     }
                 case TipNaloga.Vozac:
-                    try {
-                        Vozac v = new Vozac() {
-                            Username = username,
-                            Password = password,
-                            Ime = ime,
-                            Prezime = prezime,
-                            Email = email,
-                            JMBG = jmbg,
-                            Telefon = telefon,
-                            Pol = (pol == "M") ? PolOsobe.Musko : PolOsobe.Zensko
-                        };
-                        ms.Vozaci.Add(v);
-                        return Json("OK");
-                    } catch {
-                        return Json("ERROR_USERNAME_EXISTS");
+                    if (Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer)) {
+                        try {
+                            Vozac v = new Vozac() {
+                                Username = username,
+                                Password = password,
+                                Ime = ime,
+                                Prezime = prezime,
+                                Email = email,
+                                JMBG = jmbg,
+                                Telefon = telefon,
+                                Pol = (pol == "M") ? PolOsobe.Musko : PolOsobe.Zensko
+                            };
+                            ms.Vozaci.Add(v);
+                            return Json("OK");
+                        } catch {
+                            return Json("ERROR_USERNAME_EXISTS");
+                        }
+                    } else {
+                        return Json("ERROR_NOT_ALLOWED");
                     }
                 case TipNaloga.Greska:
                     return Json("ERROR_ACC_TYPE_NOT_VALID");
