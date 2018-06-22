@@ -37,6 +37,19 @@ namespace ProjekatWEB.Controllers
             }
         }
 
+        [HttpPost("[action]/{token}")]
+        public JsonResult IsUsernameFree (string token, string username) {
+            if (Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer | TipNaloga.Musterija | TipNaloga.Vozac)) {
+                if (Korisnik.UsernameIsFree(username)) {
+                    return Json(true);
+                } else {
+                    return Json(false);
+                }
+            } else {
+                return Helper.ForbidenAccessJson();
+            }
+        }
+
         [HttpPost("{id}/{token}")]
         public JsonResult Post(int id, string token, string username, string password, string pol, string email, string jmbg, string telefon, string ime, string prezime) {
             if (Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer | TipNaloga.Musterija | TipNaloga.Vozac)) {
