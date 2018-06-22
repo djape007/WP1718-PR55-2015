@@ -123,17 +123,17 @@ function ValidateForm() {
 		var tel = $("#rf-telefon").val();
 		
 		if (!InputTextValid(korIme)) {
-            DisplayError("Korisnicko ime nije ispravno!");
+            DisplayError("Korisničko ime nije ispravno!");
 			return false;
 		}
 		
 		if (!InputTextValid(passw)) {
-            DisplayError("Sifra nije ispravna!");
+            DisplayError("Šifra nije ispravna!");
 			return false;
 		}
 		
 		if (!InputTextValid(passw_re)) {
-            DisplayError("Polje 'ponovi sifru' nije ispravno");
+            DisplayError("Polje 'ponovi šifru' nije ispravno");
 			return false;
 		}
 		
@@ -156,7 +156,7 @@ function ValidateForm() {
             DisplayError("JMBG nije ispravan");
 			return false;
 		} else if (!JMBGValid(jmbg)) {
-            DisplayError("JMBG moze da sadrzi samo brojeve");
+            DisplayError("JMBG može da sadrži samo brojeve");
 			return false;
 		}
 		
@@ -166,7 +166,7 @@ function ValidateForm() {
 		}
 		
 		if (passw !== passw_re) {
-            DisplayError("Sifre se ne slazu");
+            DisplayError("Šifre se ne slažu");
 			return false;
 		}
 		
@@ -176,12 +176,12 @@ function ValidateForm() {
 		var passw = $("#lf-password").val();
 		
 		if (!InputTextValid(korIme)) {
-            DisplayError("Korisnicko ime nije ispravno!");
+            DisplayError("Korisničko ime nije ispravno!");
 			return false;
 		}
 		
 		if (!InputTextValid(passw)) {
-            DisplayError("Sifra nije ispravna!");
+            DisplayError("Šifra nije ispravna!");
 			return false;
 		}
 		
@@ -200,6 +200,6 @@ function ClearRegistrationInput() {
     $("#rf-telefon").val("");
 }
 
-function JMBGValid(tekst) {
-	return tekst.match(/^[0-9]+$/) != null;
+function DisplayError(message) {
+    TOASTUJ(message);
 }
