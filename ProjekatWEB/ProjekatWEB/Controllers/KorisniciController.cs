@@ -187,5 +187,23 @@ namespace ProjekatWEB.Controllers
                 return Helper.ForbidenAccessJson();
             }
         }
+
+        [HttpGet("[action]/{token}")]
+        public JsonResult AvailableDrivers(string token) {
+            if (Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer)) {
+                List<Voznja> sveVoznje = MainStorage.Instanca.Voznje.Lista;
+                HashSet<int> idZauzetihVozaca = new HashSet<int>();
+                foreach (Voznja v in sveVoznje) {
+                    if (!idZauzetihVozaca.Contains(v.VozacID)) {
+                        idZauzetihVozaca.Add(v.VozacID);
+                    }
+                }
+
+                List<Vozac> slobodniVozaci = MainStorage.Instanca.Vozaci.FindAll(x => (!idZauzetihVozaca.Contains(x.ID)));
+                return Json(slobodniVozaci);
+            } else {
+                return Helper.ForbidenAccessJson();
+            }
+        }
     }
 }
