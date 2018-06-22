@@ -101,8 +101,9 @@ function AjaxRegisterZahtev(_username, _password, _ime, _prezime, _pol, _email, 
         if (data === "OK") {
             ToggleForme();
             ClearRegistrationInput();
+		  TOASTUJ("Nalog je napravljen");
         } else if (data === "ERROR_USERNAME_EXISTS") {
-            DisplayError("Korisnicko ime vec postoji");
+            DisplayError("Korisničko ime već postoji");
         } else if (data === "ERROR_FORM_NOT_COMPLETE") {
             DisplayError("Neko polje nije popunjeno :(");
         } else if (data.indexOf("ERROR") != -1) {
@@ -122,55 +123,7 @@ function ValidateForm() {
 		var jmbg = $("#rf-jmbg").val();
 		var tel = $("#rf-telefon").val();
 		
-		if (!InputTextValid(korIme)) {
-            DisplayError("Korisničko ime nije ispravno!");
-			return false;
-		}
-		
-		if (!InputTextValid(passw)) {
-            DisplayError("Šifra nije ispravna!");
-			return false;
-		}
-		
-		if (!InputTextValid(passw_re)) {
-            DisplayError("Polje 'ponovi šifru' nije ispravno");
-			return false;
-		}
-		
-		if (!InputTextValid(email, 4, "@.")) {
-            DisplayError("Email nije ispravan!");
-			return false;
-		}
-		
-		if (!InputTextValid(ime, 2)) {
-            DisplayError("Ime nije ispravno!");
-			return false;
-		}
-		
-		if (!InputTextValid(prezime, 2)) {
-            DisplayError("Prezime nije ispravno!");
-			return false;
-		}
-		
-		if (!InputTextValid(jmbg, 13)) {
-            DisplayError("JMBG nije ispravan");
-			return false;
-		} else if (!JMBGValid(jmbg)) {
-            DisplayError("JMBG može da sadrži samo brojeve");
-			return false;
-		}
-		
-		if (!InputTextValid(tel)) {
-            DisplayError("Telefon nije ispravan");
-			return false;
-		}
-		
-		if (passw !== passw_re) {
-            DisplayError("Šifre se ne slažu");
-			return false;
-		}
-		
-		return true;
+		return ValidateUserAccountInput(korIme, passw, passw_re, email, ime, prezime, jmbg, tel);
 	} else {
 		var korIme = $("#lf-username").val();
 		var passw = $("#lf-password").val();

@@ -44,3 +44,57 @@ function TOASTUJ(poruka) {
 		}, 3000);
 	}
 }
+
+function ValidateUserAccountInput(korIme, passw1, passw2, email, ime, prezime, jmbg, telefon, ignore_passw_check = false) {
+	if (!InputTextValid(korIme)) {
+	  DisplayError("Korisničko ime nije ispravno!");
+		return false;
+	}
+	
+	if (!InputTextValid(email, 4, "@.")) {
+	  DisplayError("Email nije ispravan!");
+		return false;
+	}
+	
+	if (!InputTextValid(ime, 2)) {
+	  DisplayError("Ime nije ispravno!");
+		return false;
+	}
+	
+	if (!InputTextValid(prezime, 2)) {
+	  DisplayError("Prezime nije ispravno!");
+		return false;
+	}
+	
+	if (!InputTextValid(jmbg, 13)) {
+	  DisplayError("JMBG nije ispravan");
+		return false;
+	} else if (!JMBGValid(jmbg)) {
+	  DisplayError("JMBG može da sadrži samo brojeve");
+		return false;
+	}
+	
+	if (!InputTextValid(telefon)) {
+	  DisplayError("Telefon nije ispravan");
+		return false;
+	}
+	
+	if (!ignore_passw_check) {
+		if (!InputTextValid(passw1)) {
+		  DisplayError("Šifra nije ispravna!");
+			return false;
+		}
+		
+		if (!InputTextValid(passw2)) {
+		  DisplayError("Polje 'ponovi šifru' nije ispravno");
+			return false;
+		}
+		
+		if (passw1 !== passw2) {
+		  DisplayError("Šifre se ne slažu");
+			return false;
+		}
+	}
+	
+	return true;
+}

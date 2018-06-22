@@ -38,6 +38,7 @@
 	display: inline-block;
 	margin-top: 12px;
 	font-size: 14px;
+	margin-bottom: 5px;
 }
 
 #openRegistartionForm:hover, #openLoginForm:hover {

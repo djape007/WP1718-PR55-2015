@@ -97,6 +97,7 @@ function DodajKarticuProfil(Korisnik) {
 function DodajKarticuDispecerKontrole() {
 	DodajKarticu("Ostale kontrole", NapraviHTMLDispecerKontrole(), false);
 	$("#btnDispDodajVozaca").click(PrikaziKarticuNapraviNalogVozaca);
+	
 }
 
 function DodajKarticuMusterijaKontrole() {
@@ -133,6 +134,7 @@ function NapraviHTMLDispecerKontrole() {
 	var s = 	"<button class='dugme' id='btnDispSveVoznje'>Prikaži sve vožnje</button>"+
 			"<button class='dugme' id='btnDispDodajVozaca'>Napravi nalog vozača</button>"+
 			"<button class='dugme' id='btnDispMojeVoznje'>Prikaži moje vožnje</button>"+
+			"<button class='dugme' id='btnDispNovaVoznja'>Kreiraj novu vožnju</button>"+
 			"<button class='dugme' id='btnDispSveKorisnike'>Prikaži sve korisnike</button>";
 	var $s = $(s);
 	return $s;
@@ -242,62 +244,33 @@ function ProveriProfileInput() {
 	var tel = $("#propValtelefon").val();
 	
 	
-	if (!InputTextValid(korIme)) {
-		DisplayError("Korisničko ime nije ispravno!");
-		return false;
-	}
-	
-	if (!InputTextValid(email, 4, "@.")) {
-		DisplayError("Email nije ispravan!");
-		return false;
-	}
-	
-	if (!InputTextValid(ime, 2)) {
-		DisplayError("Ime nije ispravno!");
-		return false;
-	}
-	
-	if (!InputTextValid(prezime, 2)) {
-		DisplayError("Prezime nije ispravno!");
-		return false;
-	}
-	
-	if (!InputTextValid(jmbg, 13)) {
-		DisplayError("JMBG nije ispravan");
-		return false;
-	} else if (!JMBGValid(jmbg)) {
-		DisplayError("JMBG može da sadrži samo brojeve");
-		return false;
-	}
-	
-	if (!InputTextValid(tel)) {
-		DisplayError("Telefon nije ispravan");
-		return false;
-	}
-	
-	if (passw_old !== "" || passw !== "" || passw_re !== "") {
-		if (!InputTextValid(passw)) {
-			DisplayError("Šifra nije ispravna!");
-			return false;
+	if (ValidateUserAccountInput(korIme, passw, passw_re, email, ime, prezime, jmbg, tel, true)) {
+		if (passw_old !== "" || passw !== "" || passw_re !== "") {
+			if (!InputTextValid(passw)) {
+				DisplayError("Šifra nije ispravna!");
+				return false;
+			}
+			
+			if (!InputTextValid(passw_re)) {
+				DisplayError("Polje 'ponovi šifru' nije ispravno");
+				return false;
+			}
+			
+			if (passw_old !== KORISNIK['password']) {
+				DisplayError("Stara šifra nije ispravna");
+				return false;
+			}
+			
+			if (passw !== passw_re) {
+				DisplayError("Šifre se ne slažu");
+				return false;
+			}
 		}
-		
-		if (!InputTextValid(passw_re)) {
-			DisplayError("Polje 'ponovi šifru' nije ispravno");
-			return false;
-		}
-		
-		if (passw_old !== KORISNIK['password']) {
-			DisplayError("Stara šifra nije ispravna");
-			return false;
-		}
-		
-		if (passw !== passw_re) {
-			DisplayError("Šifre se ne slažu");
-			return false;
-		}
-	}
 
-	return true;
+		return true;
+	} else {
+		return false;
+	}
 }
 
 function PosaljiNovePodatkeProfila() {
@@ -362,22 +335,53 @@ function PrikaziKarticuNapraviNalogVozaca() {
 	if (ACC_TYPE == "Dispecer" && !($("body").hasClass("NOVINALOGVOZACA"))) {
 		var sadrzaj = "<table><tbody>"+
 		"<tr><td><span class='propName'>Korisničko ime</span></td>	<td><input id='vozNNusername' type='text'/></td></tr>"+
-		"<tr><td><span class='propName'>Sifra</span></td>			<td><input id='vozNNpassword1' type='password'/></td></tr>"+
-		"<tr><td><span class='propName'>Sifra ponovo</span></td>	<td><input id='vozNNpassword2' type='password'/></td></tr>"+
+		"<tr><td><span class='propName'>Šifra</span></td>			<td><input id='vozNNpassword1' type='password'/></td></tr>"+
+		"<tr><td><span class='propName'>Šifra ponovo</span></td>	<td><input id='vozNNpassword2' type='password'/></td></tr>"+
 		"<tr><td><span class='propName'>Ime</span></td>			<td><input id='vozNNime' type='text'/></td></tr>"+
 		"<tr><td><span class='propName'>Prezime</span></td>		<td><input id='vozNNprezime' type='text'/></td></tr>"+
 		"<tr><td><span class='propName'>JMBG</span></td>			<td><input id='vozNNjmbg' type='text'/></td></tr>"+
 		"<tr><td><span class='propName'>Email</span></td>			<td><input id='vozNNemail' type='text'/></td></tr>"+
 		"<tr><td><span class='propName'>Telefon</span></td>		<td><input id='vozNNtelefon' type='text'/></td></tr>"+
-		"<tr><td><span class='propName'>Pol</span></td>			<td><input id='vozNNpol' type='text'/></td></tr>"+
+		"<tr><td><span class='propName'>Pol</span></td>			<td><select id='vozNNpol'><option value='M'>M</option><option value='Z'>Ž</option></select></td></tr>"+
 		"</tbody></table>"+
-		"<button class='dugme flotujDesno'>Napravi</button>";
+		"<button class='dugme flotujDesno' id='napraviNalogVozaca'>Napravi nalog</button>";
 		$("body").addClass("NOVINALOGVOZACA");
-		DodajKarticu("Novi nalog - Vozac", $(sadrzaj), true, PocistiKarticuNapraviNoviNalogVozaca);
-	} else {
-		console.log("lol");
+		
+		DodajKarticu("Novi nalog - Vozač", $(sadrzaj), true, PocistiKarticuNapraviNoviNalogVozaca);
+		$("#napraviNalogVozaca").click(NapraviNalogVozacaBtnClick);
 	}
 }
+
+function NapraviNalogVozacaBtnClick() {
+	var korIme = $("#vozNNusername").val();
+	var passw = $("#vozNNpassword1").val();
+	var passw_re = $("#vozNNpassword2").val();
+	var email = $("#vozNNemail").val();
+	var ime = $("#vozNNime").val();
+	var prezime = $("#vozNNprezime").val();
+	var jmbg = $("#vozNNjmbg").val();
+	var tel = $("#vozNNtelefon").val();
+	var pol = $("#vozNNpol").val();
+	
+	if (ValidateUserAccountInput(korIme, passw, passw_re, email, ime, prezime, jmbg, tel)) {
+		AjaxNapraviNalogVozaca(korIme, passw, ime, prezime, pol,tel, jmbg, email);
+	}
+}
+
+function AjaxNapraviNalogVozaca(_username, _password, _ime, _prezime, _pol, _telefon, _jmbg, _email) {
+	$.post("/api/Register/" + ACCESS_TOKEN, { username: _username, password: _password, ime: _ime, prezime: _prezime, pol: _pol, email: _email, telefon: _telefon, jmbg: _jmbg, tipNaloga_str: "Vozac"}, function (data) {
+        if (data === "OK") {
+            TOASTUJ("Nalog je kreiran");
+        } else if (data === "ERROR_USERNAME_EXISTS") {
+            DisplayError("Korisničko ime već postoji");
+        } else if (data === "ERROR_FORM_NOT_COMPLETE") {
+            DisplayError("Neko polje nije popunjeno :(");
+        } else if (data.indexOf("ERROR") != -1) {
+            DisplayError(data);
+        }
+    }, "json");
+}
+
 //poziva se kad se zatvori kartica za pravljenje novog naloga vozaca
 function PocistiKarticuNapraviNoviNalogVozaca() {
 	$("body").removeClass("NOVINALOGVOZACA");
