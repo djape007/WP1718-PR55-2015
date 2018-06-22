@@ -8,12 +8,22 @@ namespace ProjekatWEB
     public class Korisnik
     {
         static HashSet<string> postojeciUsernameovi = new HashSet<string>();
+        static HashSet<int> zauzetiID = new HashSet<int>();
 
         static int brojacInstanci = 0;
 
+        int id;
         string username;
 
-        public int ID { get; set; }
+        public int ID { 
+            get {
+                return id;
+            }
+            set {
+                id = value;
+                zauzetiID.Add(id);
+            }
+        }
         public string Username { 
             get {
                 return username;
@@ -42,7 +52,9 @@ namespace ProjekatWEB
         public Korisnik(int id = -1) {
             AktivanNalog = true;
             if (id == -1) {
-                brojacInstanci++;
+                while (zauzetiID.Contains(brojacInstanci)) {
+                    brojacInstanci++;
+                }
                 ID = brojacInstanci;
             }
         }

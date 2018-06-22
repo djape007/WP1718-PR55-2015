@@ -7,9 +7,20 @@ namespace ProjekatWEB
 {
     public class Komentar
     {
+        HashSet<int> zauzetiID = new HashSet<int>();
         static int brojacInstanci = 0;
+        int id;
 
-        public int ID { get; set; }
+        public int ID {
+            get {
+                return id;
+            }
+
+            set {
+                id = value;
+                zauzetiID.Add(value);
+            }
+        }
         public string Opis { get; set; }
         public DateTime DatumObjave { get; set; }
         public int Autor { get; set; }
@@ -18,7 +29,9 @@ namespace ProjekatWEB
 
         public Komentar(int id = -1, bool postaviDatum = false) {
             if (id == -1) {
-                brojacInstanci++;
+                while (zauzetiID.Contains(brojacInstanci)) {
+                    brojacInstanci++;
+                }
                 ID = brojacInstanci;
             }
 
