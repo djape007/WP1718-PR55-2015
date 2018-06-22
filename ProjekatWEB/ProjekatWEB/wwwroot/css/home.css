@@ -71,6 +71,10 @@ table {
 	margin-bottom: 25px;
 }
 
+.flotujDesno {
+	float: right;
+}
+
 .propName {
 	float: right;
 	font-weight: bold;
@@ -87,6 +91,20 @@ table {
 	float: right;
 	margin-right: 5px;
 	margin-bottom: 5px;
+}
+
+.dugme {
+	padding: 4px 10px;
+	border: none;
+	margin: 5px;
+	border-radius: 5px;
+	background-color: white;
+	color: purple;
+}
+
+.dugme:hover {
+	cursor: pointer;
+	background-color: #ddd;
 }
 
 @media only screen and (max-width: 833px) {

@@ -1,7 +1,7 @@
 $(document).ready(function(){
 	$("#btnLogout").click(Logout);
 	Init();
-	AjaxGetKorisnika(ACC_ID, true);
+	AjaxGetKorisnika(ACC_ID, true, LateInit);
 });
 
 var ACC_ID = -1;
@@ -11,6 +11,16 @@ var KORISNIK = null;
 
 function Init() {
 	UcitajPodatkeIzKolaca();
+}
+
+function LateInit() {
+	if (ACC_TYPE === "Musterija") {
+		DodajKarticuMusterijaKontrole();
+	} else if (ACC_TYPE === "Vozac") {
+		DodajKarticuVozacKontrole();
+	} else if (ACC_TYPE === "Dispecer") {
+		DodajKarticuDispecerKontrole();
+	}
 }
 
 function UcitajPodatkeIzKolaca() {
@@ -32,7 +42,7 @@ function ObrisiKolace() {
 	Cookies.remove('access_token');
 }
 
-function DodajKarticu(naslov, $sadrzaj, mozeDaSeZatvori = false) {
+function DodajKarticu(naslov, $sadrzaj, mozeDaSeZatvori = false, funcPrilikomZatvaranja = null) {
 	var x = '<span class="zatvoriKarticu">X</span>';
 	
 	if (!mozeDaSeZatvori) {
@@ -44,28 +54,36 @@ function DodajKarticu(naslov, $sadrzaj, mozeDaSeZatvori = false) {
 						'<span class="titleKartice">'+naslov+'</span>'+
 						x +
 					'</div>'+
-					'<div class="teloKartice visina200 col-12">'+
+					'<div class="teloKartice visina60 col-12">'+
 					'</div>'+
 				'</div>';
 	
 	var $kartica = $(kartica);
 	if (mozeDaSeZatvori) {
-		$kartica.find(".zatvoriKarticu").first().click(ZatvoriKarticuNaX);
+		$kartica.find(".zatvoriKarticu").first().click({param1: funcPrilikomZatvaranja},ZatvoriKarticuNaX);
 	}
 	$kartica.find(".teloKartice").first().append($sadrzaj);
 	$(".glavniSadrzaj").first().append($kartica);
 }
 
-function ZatvoriKarticuNaX() {
+function ZatvoriKarticuNaX(event) {
+	var customFunc = event.data.param1;
 	$(this).parent().parent().remove();
+	if (customFunc != null) {
+		customFunc();
+	}
 }
 
-function AjaxGetKorisnika(id, dodajKarticu = false) {
+function AjaxGetKorisnika(id, dodajKarticu = false, LateInit = null) {
 	$.get("/api/Korisnici/" + id.toString() + "/" + ACCESS_TOKEN , {}, function (data) {
 		console.log(data);
 		KORISNIK = data;
 		if (dodajKarticu) {
 			DodajKarticuProfil(KORISNIK);
+		}
+		
+		if (LateInit != null) {
+			LateInit();
 		}
 	});
 }
@@ -74,6 +92,65 @@ function DodajKarticuProfil(Korisnik) {
 	DodajKarticu("Profil", $(TabelaProfilKorisnika(Korisnik)), false);
 	$("#btnProfilEdit").click(TogleEditProfileData);
 	$("#btnProfilSacuvaj").click(TogleEditProfileData);
+}
+
+function DodajKarticuDispecerKontrole() {
+	DodajKarticu("Ostale kontrole", NapraviHTMLDispecerKontrole(), false);
+	$("#btnDispDodajVozaca").click(PrikaziKarticuNapraviNalogVozaca);
+}
+
+function DodajKarticuMusterijaKontrole() {
+	DodajKarticu("Ostale kontrole", NapraviHTMLMusterijaKontrole(), false);
+}
+
+function DodajKarticuVozacKontrole() {
+	DodajKarticu("Ostale kontrole", NapraviHTMLVozacKontrole(), false);
+}
+
+function DodajKarticuSveVoznjeMusterije() {
+}
+
+function AjaxSveVoznjeMusterije(idMusterije) {
+	$.get("/api/Voznje/WhereCustomer/" + idMusterije + "/" + ACCESS_TOKEN, {}, function (data) {
+		if (data == null) {
+			
+		} else if (data.indexOf("ERROR_") != -1) {
+			TOASTUJ(data);
+		} else {
+			if (data.length == 0) {
+				console.log("Nema voznji");
+			}
+			console.log();
+		}
+	});
+}
+
+function DodajKarticuPretragaVoznji() {
+	
+}
+
+function NapraviHTMLDispecerKontrole() {
+	var s = 	"<button class='dugme' id='btnDispSveVoznje'>Prikaži sve vožnje</button>"+
+			"<button class='dugme' id='btnDispDodajVozaca'>Napravi nalog vozača</button>"+
+			"<button class='dugme' id='btnDispMojeVoznje'>Prikaži moje vožnje</button>"+
+			"<button class='dugme' id='btnDispSveKorisnike'>Prikaži sve korisnike</button>";
+	var $s = $(s);
+	return $s;
+}
+
+function NapraviHTMLMusterijaKontrole() {
+	var s = 	"<button class='dugme' id='btnMustZakazi'>Zakaži vožnju</button>"+
+			"<button class='dugme' id='btnMustMojeVoznje'>Prikaži moje vožnje</button>";
+	var $s = $(s);
+	return $s;
+}
+
+function NapraviHTMLVozacKontrole() {
+	var s = 	"<button class='dugme' id='btnVozaVoznjeNaCekanju'>Prikaži vožnje na cekanju</button>"+
+			"<button class='dugme' id='btnVozaUpdateLokaciju'>Postavi trenutnu lokaciju</button>"+
+			"<button class='dugme' id='btnVozaMojeVoznje'>Moje vožnje</button>";
+	var $s = $(s);
+	return $s;
 }
 
 function TabelaProfilKorisnika(Korisnik) {
@@ -93,8 +170,8 @@ function TabelaProfilKorisnika(Korisnik) {
 					IspisiPropertyTableRow("Telefon", Korisnik['telefon'], "telefon") +
 					IspisiPropertyTableRow("Pol", polStr, "pol") +
 				'</tbody></table>'+
-				'<button id="btnProfilEdit">Izmeni</button>'+
-				'<button id="btnProfilSacuvaj">Sačuvaj</button>';
+				'<button class="dugme" id="btnProfilEdit">Izmeni</button>'+
+				'<button class="dugme" id="btnProfilSacuvaj">Sačuvaj</button>';
 	return profData;
 }
 
@@ -279,4 +356,29 @@ function IspisiPropertyTableRow(propName, propVal, uniqueID) {
 
 function DisplayError(poruka) {
 	TOASTUJ(poruka);
+}
+
+function PrikaziKarticuNapraviNalogVozaca() {
+	if (ACC_TYPE == "Dispecer" && !($("body").hasClass("NOVINALOGVOZACA"))) {
+		var sadrzaj = "<table><tbody>"+
+		"<tr><td><span class='propName'>Korisničko ime</span></td>	<td><input id='vozNNusername' type='text'/></td></tr>"+
+		"<tr><td><span class='propName'>Sifra</span></td>			<td><input id='vozNNpassword1' type='password'/></td></tr>"+
+		"<tr><td><span class='propName'>Sifra ponovo</span></td>	<td><input id='vozNNpassword2' type='password'/></td></tr>"+
+		"<tr><td><span class='propName'>Ime</span></td>			<td><input id='vozNNime' type='text'/></td></tr>"+
+		"<tr><td><span class='propName'>Prezime</span></td>		<td><input id='vozNNprezime' type='text'/></td></tr>"+
+		"<tr><td><span class='propName'>JMBG</span></td>			<td><input id='vozNNjmbg' type='text'/></td></tr>"+
+		"<tr><td><span class='propName'>Email</span></td>			<td><input id='vozNNemail' type='text'/></td></tr>"+
+		"<tr><td><span class='propName'>Telefon</span></td>		<td><input id='vozNNtelefon' type='text'/></td></tr>"+
+		"<tr><td><span class='propName'>Pol</span></td>			<td><input id='vozNNpol' type='text'/></td></tr>"+
+		"</tbody></table>"+
+		"<button class='dugme flotujDesno'>Napravi</button>";
+		$("body").addClass("NOVINALOGVOZACA");
+		DodajKarticu("Novi nalog - Vozac", $(sadrzaj), true, PocistiKarticuNapraviNoviNalogVozaca);
+	} else {
+		console.log("lol");
+	}
+}
+//poziva se kad se zatvori kartica za pravljenje novog naloga vozaca
+function PocistiKarticuNapraviNoviNalogVozaca() {
+	$("body").removeClass("NOVINALOGVOZACA");
 }
