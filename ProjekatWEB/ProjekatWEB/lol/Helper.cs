@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -149,6 +150,10 @@ namespace ProjekatWEB
             }
 
             return vrati;
+        }
+
+        public static T KlonirajObjekat<T>(T objekat) {
+            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(objekat));
         }
     }
 }

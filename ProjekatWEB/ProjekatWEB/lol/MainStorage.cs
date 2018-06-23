@@ -126,5 +126,9 @@ namespace ProjekatWEB
 
             return k;
         }
+
+        public List<Komentar> GetKomentareSaIdem(List<int> ideviKomentara) {
+            return Instanca.Komentari.FindAll(x => (ideviKomentara.Contains(x.ID)));
+        }
     }
 }

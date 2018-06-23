@@ -11,6 +11,7 @@ namespace ProjekatWEB
         string brojVozila = "";
 
         public int VozacID { get; set; }
+        public Vozac VozacOBJ { get; set; }
         public int GodisteAutomobila { get; set; }
         public string BrojVozila {
             get {

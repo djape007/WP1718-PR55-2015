@@ -28,9 +28,15 @@ namespace ProjekatWEB.Controllers
 
                 Dictionary<string, object> vrati = new Dictionary<string, object>() {
                     { "Musterije", MainStorage.Instanca.Musterije.Lista },
-                    { "Vozaci", MainStorage.Instanca.Vozaci.Lista },
                     { "Dispeceri", MainStorage.Instanca.Dispeceri.Lista }
                 };
+
+                List<Vozac> sviVozaci = Helper.KlonirajObjekat<List<Vozac>>(MainStorage.Instanca.Vozaci.Lista);
+                foreach(Vozac v in sviVozaci) {
+                    v.AutomobilOBJ = MainStorage.Instanca.Automobili.FirstOrDefault(x => x.BrojVozila == v.Automobil);
+                }
+
+                vrati.Add("Vozaci", sviVozaci);
 
                 return Json(vrati);
             } else {
@@ -199,7 +205,12 @@ namespace ProjekatWEB.Controllers
                     }
                 }
 
-                List<Vozac> slobodniVozaci = MainStorage.Instanca.Vozaci.FindAll(x => (!idZauzetihVozaca.Contains(x.ID)));
+                List<Vozac> slobodniVozaci = Helper.KlonirajObjekat<List<Vozac>>(MainStorage.Instanca.Vozaci.FindAll(x => (!idZauzetihVozaca.Contains(x.ID))));
+
+                foreach(Vozac v in slobodniVozaci) {
+                    v.AutomobilOBJ = MainStorage.Instanca.Automobili.FirstOrDefault(x => x.BrojVozila == v.Automobil);
+                }
+
                 return Json(slobodniVozaci);
             } else {
                 return Helper.ForbidenAccessJson();

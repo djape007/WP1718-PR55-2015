@@ -23,6 +23,8 @@ namespace ProjekatWEB.Controllers
                 if (a.VozacID != Korisnik.GetIDFromToken(token)) {
                     return Json("ERROR_YOU_ARE_NOT_OWNER");
                 }
+
+                a.VozacOBJ = MainStorage.Instanca.Vozaci.FirstOrDefault(x => x.ID == a.VozacID);
                 
                 return Json(a);
             } else {
@@ -41,7 +43,7 @@ namespace ProjekatWEB.Controllers
                         v = MainStorage.Instanca.Vozaci.FirstOrDefault(x => x.ID == idVozaca);
                         if (v == null) {
                             return Json("ERROR_DRIVER_DOES_NOT_EXIST");
-                        } else if (v.Automobil != "") {
+                        } else if (v.Automobil != null) {
                             return Json("ERROR_DRIVER_ALREADY_HAS_A_CAR");
                         }
                     }

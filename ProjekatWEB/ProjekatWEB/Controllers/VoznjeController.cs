@@ -15,7 +15,15 @@ namespace ProjekatWEB.Controllers
         [HttpGet("{token}")]
         public JsonResult Get(string token) {
             if (Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer | TipNaloga.Vozac)) {
-                return Json(MainStorage.Instanca.Voznje.Lista);
+                List<Voznja> sveVoznje = Helper.KlonirajObjekat<List<Voznja>>(MainStorage.Instanca.Voznje.Lista);
+
+                for(int i = 0; i < sveVoznje.Count; i++) {
+                    sveVoznje[i].DispecerOBJ = MainStorage.Instanca.Dispeceri.FirstOrDefault(x => x.ID == sveVoznje[i].DispecerID);
+                    sveVoznje[i].MusterijaOBJ = MainStorage.Instanca.Musterije.FirstOrDefault(x => x.ID == sveVoznje[i].MusterijaID);
+                    sveVoznje[i].VozacOBJ = MainStorage.Instanca.Vozaci.FirstOrDefault(x => x.ID == sveVoznje[i].VozacID);
+                    sveVoznje[i].KomentariOBJ = MainStorage.Instanca.Komentari.FindAll(x => (sveVoznje[i].KomentarID.Contains(x.ID)));
+                }
+                return Json(sveVoznje);
             } else {
                 return Helper.ForbidenAccessJson();
             }
@@ -24,12 +32,20 @@ namespace ProjekatWEB.Controllers
         [HttpGet("{id}/{token}")]
         public JsonResult Get(int id, string token) {
             if (Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer | TipNaloga.Vozac | TipNaloga.Musterija)) {
-                if (id >= 0) {
-                    var voznja = MainStorage.Instanca.Voznje.Find(x => x.ID == id);
-                    return Json(voznja);
-                } else {
-                    return Json(null);
+                var voznja = MainStorage.Instanca.Voznje.FirstOrDefault(x => x.ID == id);
+
+                if (voznja == null) {
+                    return Json("ERROR_RIDE_DOES_NOT_EXIST");
                 }
+
+                voznja = Helper.KlonirajObjekat<Voznja>(voznja);
+
+                voznja.MusterijaOBJ = MainStorage.Instanca.Musterije.FirstOrDefault(x => x.ID == voznja.MusterijaID);
+                voznja.VozacOBJ = MainStorage.Instanca.Vozaci.FirstOrDefault(x => x.ID == voznja.VozacID);
+                voznja.DispecerOBJ = MainStorage.Instanca.Dispeceri.FirstOrDefault(x => x.ID == voznja.DispecerID);
+                voznja.KomentariOBJ = MainStorage.Instanca.GetKomentareSaIdem(voznja.KomentarID);
+
+                return Json(voznja);
             } else {
                 return Helper.ForbidenAccessJson();
             }
@@ -44,7 +60,14 @@ namespace ProjekatWEB.Controllers
                         return Json("ERROR_CUSTOMER_DOES_NOT_EXIST");
                     }
 
-                    List<Voznja> voznje = MainStorage.Instanca.Voznje.FindAll(x => x.MusterijaID == id);
+                    List<Voznja> voznje = Helper.KlonirajObjekat<List<Voznja>>(MainStorage.Instanca.Voznje.FindAll(x => x.MusterijaID == id));
+
+                    foreach (Voznja v in voznje) {
+                        v.MusterijaOBJ = musterija;
+                        v.DispecerOBJ = MainStorage.Instanca.Dispeceri.FirstOrDefault(x => x.ID == v.DispecerID);
+                        v.KomentariOBJ = MainStorage.Instanca.GetKomentareSaIdem(v.KomentarID);
+                        v.VozacOBJ = MainStorage.Instanca.Vozaci.FirstOrDefault(x => x.ID == v.VozacID);
+                    }
 
                     return Json(voznje);
                 } else {
@@ -64,7 +87,14 @@ namespace ProjekatWEB.Controllers
                         return Json("ERROR_DRIVER_DOES_NOT_EXIST");
                     }
 
-                    List<Voznja> voznje = MainStorage.Instanca.Voznje.FindAll(x => x.VozacID == id);
+                    List<Voznja> voznje = Helper.KlonirajObjekat<List<Voznja>>(MainStorage.Instanca.Voznje.FindAll(x => x.VozacID == id));
+
+                    foreach(Voznja v in voznje) {
+                        v.MusterijaOBJ = MainStorage.Instanca.Musterije.FirstOrDefault(x => x.ID == v.MusterijaID);
+                        v.DispecerOBJ = MainStorage.Instanca.Dispeceri.FirstOrDefault(x => x.ID == v.DispecerID);
+                        v.KomentariOBJ = MainStorage.Instanca.GetKomentareSaIdem(v.KomentarID);
+                        v.VozacOBJ = vozac;
+                    }
 
                     return Json(voznje);
                 } else {
@@ -84,7 +114,14 @@ namespace ProjekatWEB.Controllers
                         return Json("ERROR_DISPATCHER_DOES_NOT_EXIST");
                     }
 
-                    List<Voznja> voznje = MainStorage.Instanca.Voznje.FindAll(x => x.DispecerID == id);
+                    List<Voznja> voznje = Helper.KlonirajObjekat<List<Voznja>>(MainStorage.Instanca.Voznje.FindAll(x => x.DispecerID == id));
+
+                    foreach (Voznja v in voznje) {
+                        v.MusterijaOBJ = MainStorage.Instanca.Musterije.FirstOrDefault(x => x.ID == v.MusterijaID);
+                        v.DispecerOBJ = dispecer;
+                        v.KomentariOBJ = MainStorage.Instanca.GetKomentareSaIdem(v.KomentarID);
+                        v.VozacOBJ = MainStorage.Instanca.Vozaci.FirstOrDefault(x => x.ID == v.VozacID);
+                    }
 
                     return Json(voznje);
                 } else {
@@ -133,6 +170,19 @@ namespace ProjekatWEB.Controllers
                 TipNaloga tipNaloga = Korisnik.GetTypeFromToken(token);
                 if (tipNaloga == TipNaloga.Dispecer) {
                     statusVoznje = StatusVoznje.Formirana;
+                }
+
+                object tmp = MainStorage.Instanca.Vozaci.FirstOrDefault(x=> x.ID == vozacId);
+                if (tmp == null && vozacId != -1) {
+                    return Json("ERROR_DRIVER_DOES_NOT_EXIST");
+                }
+                tmp = MainStorage.Instanca.Musterije.FirstOrDefault(x => x.ID == musterijaId);
+                if (tmp == null && musterijaId != -1) {
+                    return Json("ERROR_CUSTOMER_DOES_NOT_EXIST");
+                }
+                tmp = MainStorage.Instanca.Dispeceri.FirstOrDefault(x => x.ID == dispecerId);
+                if (tmp == null && dispecerId != -1) {
+                    return Json("ERROR_DISPATCHER_DOES_NOT_EXIST");
                 }
 
                 Voznja v = new Voznja(postaviDatum: true) {
@@ -246,6 +296,7 @@ namespace ProjekatWEB.Controllers
                     try {
                         Lokacija kraj = JsonConvert.DeserializeObject<Lokacija>(krajLokacijaJSON);
                         tmpV.Odrediste = kraj;
+                        tmpV.Iznos = Helper.IzracunajCenuVoznje(tmpV.PocetnaLokacija, tmpV.Odrediste);
                         MainStorage.Instanca.UpdateVoznju(tmpV);
                         return Json("OK");
                     } catch {

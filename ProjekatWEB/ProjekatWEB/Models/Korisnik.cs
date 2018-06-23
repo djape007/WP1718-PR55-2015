@@ -56,6 +56,8 @@ namespace ProjekatWEB
                     brojacInstanci++;
                 }
                 ID = brojacInstanci;
+            } else {
+                ID = id;
             }
         }
 

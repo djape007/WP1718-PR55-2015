@@ -14,7 +14,14 @@ namespace ProjekatWEB.Controllers
         [HttpGet("{token}")]
         public JsonResult Get(string token) {
             if (Authorize.IsAllowedToAccess(token, TipNaloga.Vozac | TipNaloga.Musterija | TipNaloga.Dispecer)) {
-                return Json(MainStorage.Instanca.Komentari.Lista);
+                List<Komentar> sviKomentari = Helper.KlonirajObjekat<List<Komentar>>(MainStorage.Instanca.Komentari.Lista);
+
+                foreach(Komentar k in sviKomentari) {
+                    k.AutorOBJ = MainStorage.Instanca.NadjiKorisnikaPoId(k.Autor);
+                    k.VoznjaOBJ = MainStorage.Instanca.Voznje.FirstOrDefault(x => x.ID == k.Voznja);
+                }
+
+                return Json(sviKomentari);
             } else {
                 return Helper.ForbidenAccessJson();
             }
@@ -28,6 +35,9 @@ namespace ProjekatWEB.Controllers
                 if (k == null) {
                     return Json("ERROR_COMMENT_DOES_NOT_EXIST");
                 }
+                k = Helper.KlonirajObjekat<Komentar>(k);
+                k.VoznjaOBJ = MainStorage.Instanca.Voznje.FirstOrDefault(x => x.ID == k.Voznja);
+                k.AutorOBJ = MainStorage.Instanca.NadjiKorisnikaPoId(k.Autor);
                 
                 return Json(k);
             } else {
