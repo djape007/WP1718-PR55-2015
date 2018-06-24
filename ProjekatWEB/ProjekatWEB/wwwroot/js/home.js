@@ -6,7 +6,7 @@ $(document).ready(function(){
 
 var ACC_ID = -1;
 var ACC_TYPE = "";
-var ACCES_TOKEN = "";
+var ACCESS_TOKEN = "";
 var KORISNIK = null;
 var IMA_AKTIVNA_VOZNJA = false;
 var SVE_PRIKAZANE_VOZNJE = null;
@@ -326,6 +326,8 @@ function NapraviHTMLJedneVoznje(voznja) {
 	if (voznja['vozacOBJ'] != null) {
 		vozacPrikaz = voznja['vozacOBJ']['username'] + " (" + voznja['vozacOBJ']['ime'] +  ")";
 	}
+
+	var tipVozilaPrikaz = voznja['tipAutomobila'] == 0 ? "Automobil" : "Kombi";
 	
 	var vozacDispecerInfo = 	"<span class='voznjaVozac'>Vozač: "+vozacPrikaz+"</span></br>"+
 						"<span class='voznjaDispecer'>Dispečer: "+dispecerPrikaz+"</span></br>"+
@@ -333,7 +335,8 @@ function NapraviHTMLJedneVoznje(voznja) {
 						
 	var basicInfoOVoznji = 	"<span class='voznjaStatus'>Status: "+statusVoznjeZaPrikaz+"</span></br>"+
 						"<span class='voznjaDatum'>Datum: "+datumStr+"</span></br>"+
-						"<span class='voznjaCena'>Cena: "+voznja['iznos']+"</span></br>";
+						"<span class='voznjaCena'>Cena: "+voznja['iznos']+"</span></br>"+
+						"<span class='tipVozila'>Vozilo: "+tipVozilaPrikaz+"</span>";
 	
 	
 	var sviKomentari = NapraviHtmlSviKomentari(voznja['komentariOBJ']);
@@ -709,41 +712,131 @@ function PrikaziKarticuKreirajVoznju() {
 	if (IMA_AKTIVNA_VOZNJA) {
 		TOASTUJ("POSTOJI AKTIVNA VOŽNJA");
 	} else if (!($("body").hasClass("KARTICANOVAVOZNJA"))) {
-		$("body").addClass("KARTICANOVAVOZNJA")
-		DodajKarticu("Nova vožnja", KarticaNovaVoznjaHTMLSadrzaj(), true, KarticaNovaVoznjaCleanUp);
+		if (ACC_TYPE == "Musterija") {
+			$("body").addClass("KARTICANOVAVOZNJA");
+			DodajKarticu("Nova vožnja", KarticaNovaVoznjaHTMLSadrzaj(), true, KarticaNovaVoznjaCleanUp);
+			$("#btnNapraviNovuVoznju").click(btnNapraviVoznjuClick);
+		} else if (ACC_TYPE == "Dispecer") {
+			$.get("/api/Korisnici/AvailableDrivers/" + ACCESS_TOKEN, {}, function (dataVozaci) {
+				$.get("/api/Korisnici/" + ACCESS_TOKEN, {}, function (dataKorisnici) {
+					$("body").addClass("KARTICANOVAVOZNJA");
+					DodajKarticu("Nova vožnja", KarticaNovaVoznjaHTMLSadrzaj(dataVozaci, dataKorisnici['Musterije']), true, KarticaNovaVoznjaCleanUp);
+					$("#btnNapraviNovuVoznju").click(btnNapraviVoznjuClick);
+				});
+			});
+		}
 	}
 }
 
-function KarticaNovaVoznjaHTMLSadrzaj() {
+function KarticaNovaVoznjaHTMLSadrzaj(slobodniVozaci = null, musterije = null) {
 	var dodatneMogucnosti = "";
-	if (ACC_TYPE == "Dispecer") {
+	if (ACC_TYPE == "Dispecer" && slobodniVozaci != null && musterije != null) {
+
+		var inputVozaci = "";
+		if (slobodniVozaci.length == 0) {
+			inputVozaci = "<span id='blokirajKreiranjeVoznje'>Nema slobodnih vozača</span>";
+		} else {
+			inputVozaci = "<select id='novVoznjaSlobVozacID'>";
+			for (var voz in slobodniVozaci) {
+				inputVozaci += "<option value='"+slobodniVozaci[voz]['id']+"'>"+slobodniVozaci[voz]['username'] + "</option>";
+			}
+			inputVozaci += "</select>";
+		}
+
+		var inputMusterije = "<select id='novVoznjaMusterijeID'>";
+		inputMusterije += "<option value='-1'>Van sistema</option>";
+		for (var must in musterije) {
+			inputMusterije += "<option value='"+musterije[must]['id']+"'>"+musterije[must]['username'] + "</option>";
+		}
+		inputMusterije += "</select>";
+
 		dodatneMogucnosti = "<h3>Dodatne postavke:</h3><table><tbody>"+
-		"<tr><td><span class='propName'>Musterija</span></td>			<td><input id='novVoznjaMusterija' type='text'/></td></tr>"+
-		"<tr><td><span class='propName'>Vozac</span></td>			<td><input id='novVoznjaVozac' type='text'/></td></tr>"+
+		"<tr><td><span class='propName'>Mušterija:</span></td>			<td>"+inputMusterije+"</td></tr>"+
+		"<tr><td><span class='propName'>Vozač:</span></td>			<td>"+ inputVozaci+"</td></tr>"+
 		"</tbody></table>";
 	}
 	
-	var s = "<h3>Početna lokacija:</h3><table><tbody>"+
+	var s = "<div class='col-12'>Potrebno vozilo:<select id='novVoznjaTipVozila'><option value='PutnickiAuto'>Auto</option><option value='Kombi'>Kombi</option></select></div><div class='col-6 pocLokacija'><h3>Početna lokacija:</h3><table><tbody>"+
 	"<tr><td><span class='propName'>X</span></td>			<td><input id='novVoznjaStartX' type='text'/></td></tr>"+
 	"<tr><td><span class='propName'>Y</span></td>			<td><input id='novVoznjaStartY' type='text'/></td></tr>"+
 	"<tr><td><span class='propName'>Ulica</span></td>			<td><input id='novVoznjaStartUlica' type='text'/></td></tr>"+
 	"<tr><td><span class='propName'>Broj</span></td>			<td><input id='novVoznjaStartBroj' type='text'/></td></tr>"+
 	"<tr><td><span class='propName'>Mesto</span></td>			<td><input id='novVoznjaStartMesto' type='text'/></td></tr>"+
 	"<tr><td><span class='propName'>Poštanski broj</span></td>	<td><input id='novVoznjaStartPostBr' type='text'/></td></tr>"+
-	"</tbody></table>"+
-	"<h3>Destinacija (nije obavezno):</h3><table><tbody>"+
-	"<tr><td><span class='propName'>X</span></td>			<td><input id='novVoznjaEndX' type='text'/></td></tr>"+
-	"<tr><td><span class='propName'>Y</span></td>			<td><input id='novVoznjaEndY' type='text'/></td></tr>"+
-	"<tr><td><span class='propName'>Ulica</span></td>			<td><input id='novVoznjaEndUlica' type='text'/></td></tr>"+
-	"<tr><td><span class='propName'>Broj</span></td>			<td><input id='novVoznjaEndBroj' type='text'/></td></tr>"+
-	"<tr><td><span class='propName'>Mesto</span></td>			<td><input id='novVoznjaEndMesto' type='text'/></td></tr>"+
-	"<tr><td><span class='propName'>Poštanski broj</span></td>	<td><input id='novVoznjaEndPostBr' type='text'/></td></tr>"+
-	"</tbody></table>"+ dodatneMogucnosti +
-	"<button class='dugme flotujDesno' id='napraviNovuVoznju'>Napravi vožnju</button>";
+	"</tbody></table></div>"+
+	"<div class='col-6 destLokacija'>"+dodatneMogucnosti+"</div>"+
+	"<div class='col-12'><button class='dugme flotujDesno' id='btnNapraviNovuVoznju'>Napravi vožnju</button></div>";
 	
 	return $(s);
 }
 
 function KarticaNovaVoznjaCleanUp() {
 	$("body").removeClass("KARTICANOVAVOZNJA");
+}
+
+function btnNapraviVoznjuClick() {
+	if ($("#blokirajKreiranjeVoznje").length) {
+		TOASTUJ("Nije moguće napraviti vožnju, nema slobodnih vozača");
+		return;
+	}
+
+	var tipVoznje = $("#novVoznjaTipVozila").val();
+	var startX = parseFloat($("#novVoznjaStartX").val());
+	var startY = parseFloat($("#novVoznjaStartY").val());
+	var startUlica = $("#novVoznjaStartUlica").val();
+	var startBroj = $("#novVoznjaStartBroj").val();
+	var startMesto = $("#novVoznjaStartMesto").val();
+	var startPostanskiBr = $("#novVoznjaStartPostBr").val();
+
+	var musterijaID = -1;
+	var vozacID = -1;
+	var dispecerID = -1;
+
+	if (isNaN(startX)) {
+		TOASTUJ("Početna lok. X nije ispravno");
+		return;
+	}
+
+	if (isNaN(startY)) {
+		TOASTUJ("Početna lok. Y nije ispravno");
+		return;
+	}
+
+	if (ACC_TYPE == "Dispecer") {
+		musterijaID = $("#novVoznjaMusterijeID").val();
+		vozacID = $("#novVoznjaSlobVozacID").val();
+		dispecerID = ACC_ID;
+	} else if (ACC_TYPE == "Musterija") {
+		musterijaID = ACC_ID;
+	}
+
+	var startObj = NapraviObjekatLokacija(startX, startY, startUlica, startBroj, startMesto, startPostanskiBr);
+
+	startObj = JSON.stringify(startObj);
+
+	$.post("/api/Voznje/" + ACCESS_TOKEN, {
+		pocetnaLokacijaJSON: startObj,
+		tipAutomobila: tipVoznje,
+		musterijaId: musterijaID,
+		dispecerId: dispecerID,
+		vozacId: vozacID
+	}, function (data) {
+		if (data.indexOf("ERROR_") != -1) {
+			DisplayError(data);
+		} else if (data.indexOf("OK_") != -1 ) {
+			TOASTUJ("Vožnja je kreirana");
+		}
+	});
+}
+
+function AjaxPostaviStatusVoznje(idVoznje, status, callback = null) {
+	$.post("/api/Voznje/SetStatus/" + idVoznje + "/" + ACCESS_TOKEN, {newStatus: status}, function (data) {
+		if (data.indexOf("ERROR_") != -1) {
+			DisplayError("data");
+		} else if (data.indexOf("OK_") != -1) {
+			if (callback != null) {
+				callback();
+			}
+		}
+	});
 }

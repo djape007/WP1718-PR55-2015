@@ -200,3 +200,20 @@ function VoznjaIspunjavaUslov(voznja, filter) {
 		return true;
 	}
 }
+
+function NapraviObjekatLokacija(_x, _y, _ulica, _broj, _mesto, _postanskiBroj) {
+	if (_ulica.trim() == "" && _broj.trim() == "" && _mesto.trim() == "" && _postanskiBroj == "") {
+		return null;
+	}
+
+	return {
+		X: _x,
+		Y: _y,
+		Adresa: {
+			Ulica: _ulica,
+			Broj: _broj,
+			Mesto: _mesto,
+			PozivniBroj: _postanskiBroj
+		}
+	}
+}

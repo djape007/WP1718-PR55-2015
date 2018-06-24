@@ -149,6 +149,16 @@ table {
 	margin-bottom: 6px;
 }
 
+@media only screen and (max-width: 1165px) {
+	.pocLokacija {
+		width: 100%;
+	}
+
+	.destLokacija {
+		width: 100%;
+	}
+}
+
 @media only screen and (max-width: 833px) {
 	.logo {
 		margin-left: 30px;
