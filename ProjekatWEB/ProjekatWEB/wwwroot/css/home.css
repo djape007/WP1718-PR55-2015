@@ -55,13 +55,16 @@ table {
 .zatvoriKarticu {
 	float: right;
 	margin-right: 5px;
-	color: white;
-	padding: 5px;
+	color: black;
+	padding: 2px 5px;
+	border-radius: 4px;
+	background-color: white;
 }
 
 .zatvoriKarticu:hover {
 	cursor: pointer;
-	color: black;
+	color: white;
+	background-color: #7C3069;
 }
 
 .kartica {
@@ -73,6 +76,35 @@ table {
 
 .flotujDesno {
 	float: right;
+}
+
+.centriraj {
+	text-align: center;
+}
+
+.sviKomentari {
+	display: none;
+	color: white;
+}
+
+.jednaVoznjaCont {
+	margin-top: 5px;
+	border: 3px solid #7C3069;
+	margin-bottom: 7px;
+}
+
+.voznjaKreirana {
+	border-left: 5px solid green;
+}
+
+.voznjaNeuspsna, .voznjaOtkazana {
+	border-left: 5px solid red;
+}
+
+.voznjaUspesna {
+}
+
+.voznjaObradjena {
 }
 
 .propName {
@@ -93,6 +125,10 @@ table {
 	margin-bottom: 5px;
 }
 
+.btnSakrijKomentare {
+	display: none;
+}
+
 .dugme {
 	padding: 4px 10px;
 	border: none;
@@ -105,6 +141,12 @@ table {
 .dugme:hover {
 	cursor: pointer;
 	background-color: #ddd;
+}
+
+.jedanKomentar {
+	border-bottom: 2px solid white;
+	margin-top: 4px;
+	margin-bottom: 6px;
 }
 
 @media only screen and (max-width: 833px) {
