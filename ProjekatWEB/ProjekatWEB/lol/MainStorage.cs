@@ -128,7 +128,13 @@ namespace ProjekatWEB
         }
 
         public List<Komentar> GetKomentareSaIdem(List<int> ideviKomentara) {
-            return Instanca.Komentari.FindAll(x => (ideviKomentara.Contains(x.ID)));
+            List<Komentar> sviKomentari = Helper.KlonirajObjekat<List<Komentar>>(Instanca.Komentari.FindAll(x => (ideviKomentara.Contains(x.ID))));
+
+            foreach (Komentar k in sviKomentari) {
+                k.AutorOBJ = Instanca.NadjiKorisnikaPoId(k.Autor);
+            }
+
+            return sviKomentari;
         }
     }
 }
