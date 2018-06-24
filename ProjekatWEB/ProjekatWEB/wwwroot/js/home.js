@@ -11,6 +11,11 @@ var KORISNIK = null;
 var IMA_AKTIVNA_VOZNJA = false;
 var SVE_PRIKAZANE_VOZNJE = null;
 
+const SORT_PRVO_NOVO = 0;
+const SORT_PRVO_STARO = 1;
+const SORT_PRVO_MIN_OCENA = 2;
+const SORT_PRVO_MAX_OCENA = 3;
+
 function Init() {
 	UcitajPodatkeIzKolaca();
 }
@@ -184,7 +189,8 @@ function NapraviHTMLVoznjeKartica(voznjeZaPrikaz, filter = null, sort = null) {
 						"<div class='col-12'><span> Ocena:</span><select id='ocenaOd'><option value=''></option><option value='0'>0</option><option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option><option value='5'>5</option></select>-<select id='ocenaDo'><option value=''></option><option value='0'>0</option><option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option><option value='5'>5</option></select></div>"+
 						"<div class='col-12'><span> Cena:</span><input id='cenaOd' type='text'>-<input id='cenaDo' type='text'></div>"+
 						toolbarHtmlDispecerDodatak + 
-					"<button class='dugme flotujDesno' id='btnFiltriraj'>Filtriraj</button></div></div>";
+					"<select id='sortOption'><option value='"+SORT_PRVO_NOVO+"'>Prvo najnovije</option><option value='"+SORT_PRVO_STARO+"'>Prvo najstarije</option><option value='"+SORT_PRVO_MIN_OCENA+"'>Prvo min ocena</option><option value='"+SORT_PRVO_MAX_OCENA+"'>Prvo max ocena</option></select>"+
+					"<button class='dugme flotujDesno' id='btnFiltriraj'>Primeni</button></div></div>";
 	
 	sveVoznje = NapraviHTMLSveVoznje(voznjeZaPrikaz, filter, sort);
 	
@@ -208,13 +214,61 @@ function NapraviHTMLSveVoznje(voznjeZaPrikaz, filter = null, sort = null) {
 	if (ispunjavajuUslove.length == 0) {
 		sveVoznje = "<h4>Nema vožnji</h4>";
 	} else {
+		if (sort != null) {
+			if (sort == SORT_PRVO_NOVO) {
+				ispunjavajuUslove.sort(function (a,b) {
+					if (moment(a['datumNarucivanja']) <= moment(b['datumNarucivanja'])) {
+						return 1;
+					} else {
+						return -1;
+					}
+				});
+			} else if (sort == SORT_PRVO_STARO) {
+				ispunjavajuUslove.sort(function (a,b) {
+					if (moment(a['datumNarucivanja']) > moment(b['datumNarucivanja'])) {
+						return 1;
+					} else {
+						return -1;
+					}
+				});
+			} else if (sort == SORT_PRVO_MIN_OCENA) {
+				ispunjavajuUslove.sort(function (a,b) {
+					if (a['komentariOBJ'].length > 0 && b['komentariOBJ'].length > 0) {
+						if (a['komentariOBJ'][0]['ocenaVoznje'] >= b['komentariOBJ'][0]['ocenaVoznje']) {
+							return 1;
+						} else {
+							return -1;
+						}
+					} else if (a['komentariOBJ'].length > 0) {
+						return 1;
+					} else if (b['komentariOBJ'].length > 0) {
+						return -1;
+					} else {
+						return 0;
+					}
+				});
+			} else if (sort == SORT_PRVO_MAX_OCENA) {
+				ispunjavajuUslove.sort(function (a,b) {
+					if (a['komentariOBJ'].length > 0 && b['komentariOBJ'].length > 0) {
+						if (a['komentariOBJ'][0]['ocenaVoznje'] < b['komentariOBJ'][0]['ocenaVoznje']) {
+							return 1;
+						} else {
+							return -1;
+						}
+					} else if (a['komentariOBJ'].length > 0) {
+						return -1;
+					} else if (b['komentariOBJ'].length > 0) {
+						return 1;
+					} else {
+						return 0;
+					}
+				});
+			}
+		}
+
 		for(var v in ispunjavajuUslove) {
 			var voznja = ispunjavajuUslove[v];
 			sveVoznje += NapraviHTMLJedneVoznje(voznja);
-		}
-		
-		if (sort != null) {
-			//todo sort
 		}
 	}
 	return "<div id='ovoZameniPrilikomPrimeneFilteraSorta'>" + sveVoznje + "</div>";
@@ -223,6 +277,7 @@ function NapraviHTMLSveVoznje(voznjeZaPrikaz, filter = null, sort = null) {
 function BtnFiltrirajClick() {
 	var $nesto = $(this).parent().parent().parent();
 	
+	var _SORT = $nesto.find("#sortOption").val();
 	var _status = $nesto.find("#filterStatus").val();
 	var _datumOd = moment($nesto.find("#dtpickOD").val()).format("YYYY-MM-DDTHH:mm:ssZ");
 	var _datumDo = moment($nesto.find("#dtpickDO").val()).format("YYYY-MM-DDTHH:mm:ssZ");
@@ -274,8 +329,8 @@ function BtnFiltrirajClick() {
 	_datumOd = (_datumOd == "Invalid date") ? null : _datumOd;
 	
 	var filter = NapraviFilter(_status, _datumOd, _datumDo, _ocenaOd, _ocenaDo, _cenaOd, _cenaDo, _vozIme, _vozPrez, _mustIme, _mustPrez);
-	console.log(filter);
-	$nesto.find("#ovoZameniPrilikomPrimeneFilteraSorta").replaceWith(NapraviHTMLSveVoznje(SVE_PRIKAZANE_VOZNJE, filter));
+	console.log(_SORT);
+	$nesto.find("#ovoZameniPrilikomPrimeneFilteraSorta").replaceWith(NapraviHTMLSveVoznje(SVE_PRIKAZANE_VOZNJE, filter, _SORT));
 	$(".btnPrikaziKomentare").click(TogglePrikaziKomentareVoznje);
 	$(".btnSakrijKomentare").click(TogglePrikaziKomentareVoznje);
 	$(".otkaziVoznju").click(OtkaziVoznju);
@@ -637,7 +692,7 @@ function AjaxZahtevMojeVoznje() {
 				TOASTUJ(data);
 			} else {
 				//DodajKarticuPrikazVoznji("Moje vožnje", data, "MOJEVOZNJEKARTICA");
-				DodajKarticuPrikazVoznji("Moje vožnje", data, "PRIKAZANEVOZNJEKARTICA");
+				DodajKarticuPrikazVoznji("Moje vožnje", data, "PRIKAZANEVOZNJEKARTICA", null, 0);
 			}
 		}); 
 	} else {
@@ -657,7 +712,11 @@ function AjaxZahtevSveVoznje(filter = null, sort = null) {
 				TOASTUJ(data);
 			} else {
 				//DodajKarticuPrikazVoznji("Sve vožnje", data, "SVEVOZNJEKARTICA", filter, sort);
-				DodajKarticuPrikazVoznji("Sve vožnje", data, "PRIKAZANEVOZNJEKARTICA", filter, sort);
+				if (sort == null) {
+					DodajKarticuPrikazVoznji("Sve vožnje", data, "PRIKAZANEVOZNJEKARTICA", filter, SORT_PRVO_NOVO);
+				} else {
+					DodajKarticuPrikazVoznji("Sve vožnje", data, "PRIKAZANEVOZNJEKARTICA", filter, sort);
+				}
 			}
 		}); 
 	}

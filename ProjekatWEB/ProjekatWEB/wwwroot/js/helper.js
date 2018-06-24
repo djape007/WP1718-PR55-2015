@@ -116,15 +116,6 @@ function NapraviFilter(statusVoznje = null, _datumOd = null, _datumDo = null,_oc
 	return filter;
 }
 
-function NapraviSort(_datum = null, _ocena = null) {
-	var sort = {
-		datum: _datum,
-		ocena: _ocena
-	}
-	
-	return sort;
-}
-
 var STATUS_VOZNJE_FROM_INT = {
 	0: "Kreirana",
 	1: "Otkazana",
