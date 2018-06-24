@@ -87,8 +87,9 @@ namespace ProjekatWEB.Controllers
                     Opis = komentar,
                     Voznja = voznjaId
                 };
-
+                tmpV.KomentarID.Add(k.ID);
                 MainStorage.Instanca.Komentari.Add(k);
+                MainStorage.Instanca.UpdateVoznju(tmpV);
                 return Json("OK_" + k.ID.ToString());
             } else {
                 return Helper.ForbidenAccessJson();

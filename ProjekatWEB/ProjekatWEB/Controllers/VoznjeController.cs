@@ -21,7 +21,7 @@ namespace ProjekatWEB.Controllers
                     sveVoznje[i].DispecerOBJ = MainStorage.Instanca.Dispeceri.FirstOrDefault(x => x.ID == sveVoznje[i].DispecerID);
                     sveVoznje[i].MusterijaOBJ = MainStorage.Instanca.Musterije.FirstOrDefault(x => x.ID == sveVoznje[i].MusterijaID);
                     sveVoznje[i].VozacOBJ = MainStorage.Instanca.Vozaci.FirstOrDefault(x => x.ID == sveVoznje[i].VozacID);
-                    sveVoznje[i].KomentariOBJ = MainStorage.Instanca.Komentari.FindAll(x => (sveVoznje[i].KomentarID.Contains(x.ID)));
+                    sveVoznje[i].KomentariOBJ = MainStorage.Instanca.GetKomentareSaIdem(sveVoznje[i].KomentarID);
                 }
                 return Json(sveVoznje);
             } else {
@@ -172,16 +172,18 @@ namespace ProjekatWEB.Controllers
                     statusVoznje = StatusVoznje.Formirana;
                 }
 
-                object tmp = MainStorage.Instanca.Vozaci.FirstOrDefault(x=> x.ID == vozacId);
-                if (tmp == null && vozacId != -1) {
+                Vozac tmpVozac = MainStorage.Instanca.Vozaci.FirstOrDefault(x=> x.ID == vozacId);
+                if (tmpVozac == null && vozacId != -1) {
                     return Json("ERROR_DRIVER_DOES_NOT_EXIST");
                 }
-                tmp = MainStorage.Instanca.Musterije.FirstOrDefault(x => x.ID == musterijaId);
-                if (tmp == null && musterijaId != -1) {
+
+                Musterija tmpMust = MainStorage.Instanca.Musterije.FirstOrDefault(x => x.ID == musterijaId);
+                if (tmpMust == null && musterijaId != -1) {
                     return Json("ERROR_CUSTOMER_DOES_NOT_EXIST");
                 }
-                tmp = MainStorage.Instanca.Dispeceri.FirstOrDefault(x => x.ID == dispecerId);
-                if (tmp == null && dispecerId != -1) {
+
+                Dispecer tmpDisp = MainStorage.Instanca.Dispeceri.FirstOrDefault(x => x.ID == dispecerId);
+                if (tmpDisp == null && dispecerId != -1) {
                     return Json("ERROR_DISPATCHER_DOES_NOT_EXIST");
                 }
 
@@ -230,9 +232,21 @@ namespace ProjekatWEB.Controllers
             if (Authorize.IsAllowedToAccess(token, TipNaloga.Vozac | TipNaloga.Dispecer)) {
                 Voznja tmpV = MainStorage.Instanca.Voznje.FirstOrDefault(x => x.ID == id);
                 if (tmpV != null) {
+                    if ((tmpV.Status != StatusVoznje.Formirana && tmpV.Status != StatusVoznje.Kreirana) || tmpV.VozacID > 0) {
+                        return Json("ERROR_CANT_SET_DRIVER_FOR_THIS_RIDE");
+                    }
+
                     Vozac tmpVozac = MainStorage.Instanca.Vozaci.FirstOrDefault(x => x.ID == idVozaca);
                     if (tmpVozac != null) {
                         tmpV.VozacID = idVozaca;
+                        
+                        if (Korisnik.GetTypeFromToken(token) == TipNaloga.Vozac) {
+                            tmpV.Status = StatusVoznje.Prihvacena;
+                        } else if (Korisnik.GetTypeFromToken(token) == TipNaloga.Dispecer) {
+                            tmpV.Status = StatusVoznje.Obradjena;
+                        }
+
+
                         MainStorage.Instanca.UpdateVoznju(tmpV);
                         return Json("OK");
                     } else {
@@ -278,7 +292,7 @@ namespace ProjekatWEB.Controllers
                         MainStorage.Instanca.UpdateVoznju(tmpV);
                         return Json("OK");
                     } catch {
-                        return Json("ERROR_DRIVE_STATUS_NOT_CORRECT");
+                        return Json("ERROR_RIDE_STATUS_NOT_CORRECT");
                     }
                 } else {
                     return Json("ERROR_RIDE_ID_DOES_NOT_EXIST");
