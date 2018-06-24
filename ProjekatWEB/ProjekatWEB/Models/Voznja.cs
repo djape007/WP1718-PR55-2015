@@ -19,6 +19,7 @@ namespace ProjekatWEB
                 id = value;
             }
         }
+
         public DateTime DatumNarucivanja { get; set; }
         public Lokacija PocetnaLokacija { get; set; }
         public int MusterijaID { get; set; }
@@ -33,6 +34,7 @@ namespace ProjekatWEB
         public List<Komentar> KomentariOBJ { get; set; }
         public StatusVoznje Status { get; set; }
         public TipVoznje TipVoznje { get; set; }
+        public TipAutomobila TipAutomobila { get; set; }
 
         public Voznja(int id = -1, bool postaviDatum = false) {
             if (id == -1) {

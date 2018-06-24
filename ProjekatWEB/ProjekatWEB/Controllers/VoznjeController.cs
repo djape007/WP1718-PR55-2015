@@ -133,23 +133,17 @@ namespace ProjekatWEB.Controllers
         }
 
         [HttpPost("{token}")]
-        public JsonResult Post(string token, string pocetnaLokacijaJSON, string krajnjaLokacijaJSON, int musterijaId = -1, int dispecerId = -1,int vozacId = -1) {
-            if (Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer | TipNaloga.Vozac | TipNaloga.Musterija)) {
-                if (pocetnaLokacijaJSON == null || krajnjaLokacijaJSON == null || pocetnaLokacijaJSON.Trim() == "") {
+        public JsonResult Post(string token, string pocetnaLokacijaJSON, string tipAutomobila, int musterijaId = -1, int dispecerId = -1,int vozacId = -1) {
+            if (Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer | TipNaloga.Musterija)) {
+                if (pocetnaLokacijaJSON == null || pocetnaLokacijaJSON.Trim() == "") {
                     return Json("ERROR_LOCATIONS_ARE_NULL_OR_EMPTY");
                 }
 
                 Lokacija pocetak;
-                Lokacija kraj;
+                Lokacija kraj = null;
 
                 try {
                     pocetak = JsonConvert.DeserializeObject<Lokacija>(pocetnaLokacijaJSON);
-
-                    if (krajnjaLokacijaJSON.Trim() == "") {
-                        kraj = null;
-                    } else {
-                        kraj = JsonConvert.DeserializeObject<Lokacija>(krajnjaLokacijaJSON);
-                    }
                 } catch {
                     return Json("ERROR_JSON_STRING_LOCATION_FORMAT_NOT_CORRECT");
                 }
@@ -170,6 +164,13 @@ namespace ProjekatWEB.Controllers
                 TipNaloga tipNaloga = Korisnik.GetTypeFromToken(token);
                 if (tipNaloga == TipNaloga.Dispecer) {
                     statusVoznje = StatusVoznje.Formirana;
+                }
+
+                TipAutomobila tipAuta = TipAutomobila.PutnickiAuto;
+                try {
+                    tipAuta = Helper.TipAutomobilaFromString(tipAutomobila);
+                } catch {
+
                 }
 
                 Vozac tmpVozac = MainStorage.Instanca.Vozaci.FirstOrDefault(x=> x.ID == vozacId);
@@ -195,6 +196,7 @@ namespace ProjekatWEB.Controllers
                     Status = statusVoznje,
                     PocetnaLokacija = pocetak,
                     Odrediste = kraj,
+                    TipAutomobila = tipAuta,
                     Iznos = (kraj != null) ? Helper.IzracunajCenuVoznje(pocetak, kraj) : -1
                 };
 

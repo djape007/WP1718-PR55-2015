@@ -53,67 +53,59 @@ namespace ProjekatWEB.Controllers
                 return Json("ERROR_JMBG_NOT_CORRECT");
             }
 
+            if (!Korisnik.UsernameIsFree(username)) {
+                return Json("ERROR_USERNAME_ALREADY_IN_USE");
+            }
+
             TipNaloga tipNaloga = Helper.TipNalogaFromString(tipNaloga_str);
 
             switch (tipNaloga) {
                 case TipNaloga.Musterija:
-                    try {
-                        Musterija m = new Musterija() {
-                                Username = username,
-                                Password = password,
-                                Ime = ime,
-                                Prezime = prezime,
-                                Email = email,
-                                JMBG = jmbg,
-                                Telefon = telefon,
-                                Pol = (pol == "M") ? PolOsobe.Musko : PolOsobe.Zensko
-                            };
-                        ms.Musterije.Add(m);
+                    Musterija m = new Musterija() {
+                            Username = username,
+                            Password = password,
+                            Ime = ime,
+                            Prezime = prezime,
+                            Email = email,
+                            JMBG = jmbg,
+                            Telefon = telefon,
+                            Pol = (pol == "M") ? PolOsobe.Musko : PolOsobe.Zensko
+                        };
+                    ms.Musterije.Add(m);
 
-                        return Json("OK");
-                    } catch {
-                        return Json("ERROR_USERNAME_EXISTS");
-                    }
+                    return Json("OK");
 
                 case TipNaloga.Dispecer:
                     if (Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer)) {
-                        try {
-                            Dispecer d = new Dispecer() {
-                                Username = username,
-                                Password = password,
-                                Ime = ime,
-                                Prezime = prezime,
-                                Email = email,
-                                JMBG = jmbg,
-                                Telefon = telefon,
-                                Pol = (pol == "M") ? PolOsobe.Musko : PolOsobe.Zensko
-                            };
-                            ms.Dispeceri.Add(d);
-                            return Json("OK");
-                        } catch {
-                            return Json("ERROR_USERNAME_EXISTS");
-                        }
+                        Dispecer d = new Dispecer() {
+                            Username = username,
+                            Password = password,
+                            Ime = ime,
+                            Prezime = prezime,
+                            Email = email,
+                            JMBG = jmbg,
+                            Telefon = telefon,
+                            Pol = (pol == "M") ? PolOsobe.Musko : PolOsobe.Zensko
+                        };
+                        ms.Dispeceri.Add(d);
+                        return Json("OK");
                     } else {
                         return Json("ERROR_NOT_ALLOWED");
                     }
                 case TipNaloga.Vozac:
                     if (Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer)) {
-                        try {
-                            Vozac v = new Vozac() {
-                                Username = username,
-                                Password = password,
-                                Ime = ime,
-                                Prezime = prezime,
-                                Email = email,
-                                JMBG = jmbg,
-                                Telefon = telefon,
-                                Pol = (pol == "M") ? PolOsobe.Musko : PolOsobe.Zensko
-                            };
-                            ms.Vozaci.Add(v);
-                            return Json("OK");
-                        } catch {
-                            return Json("ERROR_USERNAME_EXISTS");
-                        }
+                        Vozac v = new Vozac() {
+                            Username = username,
+                            Password = password,
+                            Ime = ime,
+                            Prezime = prezime,
+                            Email = email,
+                            JMBG = jmbg,
+                            Telefon = telefon,
+                            Pol = (pol == "M") ? PolOsobe.Musko : PolOsobe.Zensko
+                        };
+                        ms.Vozaci.Add(v);
+                        return Json("OK");
                     } else {
                         return Json("ERROR_NOT_ALLOWED");
                     }

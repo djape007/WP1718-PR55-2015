@@ -29,12 +29,8 @@ namespace ProjekatWEB
                 return username;
             }
             set {
-                if (postojeciUsernameovi.Contains(value.ToLower())) {
-                    throw new Exception(value + " je zauzeto");
-                } else {
-                    username = value.ToLower();
-                    postojeciUsernameovi.Add(value.ToLower());
-                }
+                username = value.ToLower();
+                postojeciUsernameovi.Add(value.ToLower());
             }
         }
 
