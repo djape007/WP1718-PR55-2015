@@ -145,6 +145,8 @@ function DodajKarticuPrikazVoznji(naslov, voznjeZaPrikaz, customIDkartice, filte
 		DodajKarticu(naslov, NapraviHTMLVoznjeKartica(voznjeZaPrikaz, filter, sort),true, function() { $("body").removeClass(customIDkartice); });
 		$(".btnPrikaziKomentare").click(TogglePrikaziKomentareVoznje);
 		$(".btnSakrijKomentare").click(TogglePrikaziKomentareVoznje);
+		$(".otkaziVoznju").click(OtkaziVoznju);
+		$(".DodajKomentar").click(DodajKomentar);
 		$("#btnFiltriraj").click(BtnFiltrirajClick);
 		jQuery('#dtpickOD').datetimepicker({
 			//format: 'Y-m-d H',
@@ -276,6 +278,8 @@ function BtnFiltrirajClick() {
 	$nesto.find("#ovoZameniPrilikomPrimeneFilteraSorta").replaceWith(NapraviHTMLSveVoznje(SVE_PRIKAZANE_VOZNJE, filter));
 	$(".btnPrikaziKomentare").click(TogglePrikaziKomentareVoznje);
 	$(".btnSakrijKomentare").click(TogglePrikaziKomentareVoznje);
+	$(".otkaziVoznju").click(OtkaziVoznju);
+	$(".DodajKomentar").click(DodajKomentar);
 	TOASTUJ("Filter je primenjen!");
 }
 
@@ -355,7 +359,7 @@ function NapraviHTMLJedneVoznje(voznja) {
 					"<div class='col-3 centriraj'>"+
 						"<span class='idVoznje'>ID: "+voznja['id']+"</span></br>"+
 						redDugmeOtkazi+
-						"<button class='dugme btnPrikaziKomentare'>Prikaži komentare</button>"+
+						"<button class='dugme btnPrikaziKomentare'>Prikaži komentare"+ ((voznja['komentariOBJ'].length > 0) ? " ("+voznja['komentariOBJ'].length.toString()+")" : "") +"</button>"+
 						"<button class='dugme btnSakrijKomentare'>Zatvori komentare</button>"+
 					"</div>"+
 					"<div class='col-9'>"+
@@ -388,10 +392,17 @@ function TogglePrikaziKomentareVoznje() {
 }
 
 function NapraviHtmlSviKomentari(komentari) {
-	var s = "";
+	var s = "<div class='col-12'>Komentari:</div>"+
+	"<div class='col-12'>"+
+	"<div class='col-4'>Komentar:<input type='text' class='noviKomentarOpis'></div>"+
+	"<div class='col-4'>Ocena:<select class='noviKomOcena'><option value='0'>Bez ocene</option><option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option><option value='5'>5</option></select></div>"+
+	"<div class='col-4'><button class='dugme flotujDesno DodajKomentar'>Dodaj komentar</button></div>"
+	"</div>";
+
 	if (komentari.length == 0) {
-		s = "<span class='porukaNemaKomentara'>Nema komentara za ovu vožnju</span>";
+		s += "<div class='col-12'><span class='porukaNemaKomentara'>Nema komentara za ovu vožnju</span></div>";
 	} else {
+		s += "<div class='col-12'>";
 		for(var k in komentari) {
 			var komentar = komentari[k];
 			var datumStr = moment(komentar['datumObjave']).format("DD.MM.YYYY. HH:mm:ss");
@@ -402,13 +413,42 @@ function NapraviHtmlSviKomentari(komentari) {
 					"<span class='komentarAutor'>Autor: "+ komentar['autorOBJ']['username'] +"</span></br>"+
 					"<span class='komentarOcena'>Ocena: "+ ocenaPrikaz+"</span></br>"+
 					"<span class='komentarDatum'>Datum: "+ datumStr+"</span>"+
-					"</div><div class='col-9'>"+
+					"</div>"+
+					"<div class='col-9'>"+
 					"<span>Poruka:</span></br>"+
 					"<span class='komentarOpis'>"+ komentar['opis']+"</span></div>"+
 				"</div>";
 		}
+		s+= "</div>";
 	}
-	return s;
+	return s + "</div>";
+}
+
+function DodajKomentar() {
+	var voznja = $(this).parent().parent().parent().parent();
+	var _voznjaId = $(voznja).attr("idVoznje");
+	
+	var _komentar = $(voznja).find(".noviKomentarOpis").first().val();
+	var _ocena = $(voznja).find(".noviKomOcena").first().val();
+
+	if (_komentar.trim() == "") {
+		DisplayError("Komentar ne sme biti prazan");
+		return;
+	}
+
+	$.post("/api/Komentari/" + ACCESS_TOKEN, {
+		komentar: _komentar,
+		autorId: ACC_ID,
+		voznjaId: _voznjaId,
+		ocena: _ocena
+	} , function (data) {
+		if (data.indexOf("ERROR_") != -1) {
+			DisplayError(data);
+		} else if (data.indexOf("OK_") != -1) {
+			TOASTUJ("Komentar je dodat");
+			$(voznja).find(".noviKomentarOpis").first().val("")
+		}
+	});
 }
 
 function NapraviHTMLDispecerKontrole() {
@@ -829,14 +869,22 @@ function btnNapraviVoznjuClick() {
 	});
 }
 
-function AjaxPostaviStatusVoznje(idVoznje, status, callback = null) {
+function AjaxPostaviStatusVoznje(idVoznje, status, callback = null, cbPar1 = null) {
 	$.post("/api/Voznje/SetStatus/" + idVoznje + "/" + ACCESS_TOKEN, {newStatus: status}, function (data) {
 		if (data.indexOf("ERROR_") != -1) {
 			DisplayError("data");
-		} else if (data.indexOf("OK_") != -1) {
+		} else if (data.indexOf("OK") != -1) {
 			if (callback != null) {
-				callback();
+				callback(cbPar1);
 			}
 		}
 	});
+}
+
+function OtkaziVoznju() {
+	var voznja = $(this).parent().parent().parent();
+	var idVoznje = $(voznja).attr('idVoznje');
+	AjaxPostaviStatusVoznje(idVoznje, "Otkazana", function (obj) {
+		$(obj).replaceWith("<span>Vožnja je otkazana</span>");
+	}, this);
 }
