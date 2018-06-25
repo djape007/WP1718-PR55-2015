@@ -16,6 +16,15 @@ namespace ProjekatWEB.Controllers
         public JsonResult Get(int id, string token) {
             if (id > 0 && Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer | TipNaloga.Musterija | TipNaloga.Vozac)) {
                 Korisnik k = MainStorage.Instanca.NadjiKorisnikaPoId(id);
+
+                if (k.TipNaloga == TipNaloga.Vozac) {
+                    Vozac v = Helper.KlonirajObjekat<Vozac>(MainStorage.Instanca.Vozaci.FirstOrDefault(x => x.ID == k.ID));
+                    if (v.Automobil != null && v.Automobil != "") {
+                        v.AutomobilOBJ = MainStorage.Instanca.Automobili.FirstOrDefault(x => x.BrojVozila == v.Automobil);
+                    }
+                    k = v;
+                }
+
                 return Json(k);
             } else {
                 return Helper.ForbidenAccessJson();
@@ -200,8 +209,10 @@ namespace ProjekatWEB.Controllers
                 List<Voznja> sveVoznje = MainStorage.Instanca.Voznje.Lista;
                 HashSet<int> idZauzetihVozaca = new HashSet<int>();
                 foreach (Voznja v in sveVoznje) {
-                    if (!idZauzetihVozaca.Contains(v.VozacID)) {
-                        idZauzetihVozaca.Add(v.VozacID);
+                    if (v.Status == StatusVoznje.Formirana || v.Status == StatusVoznje.Prihvacena) {
+                        if (!idZauzetihVozaca.Contains(v.VozacID)) {
+                            idZauzetihVozaca.Add(v.VozacID);
+                        }
                     }
                 }
 
