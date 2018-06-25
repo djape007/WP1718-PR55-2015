@@ -1,6 +1,10 @@
 
-function PostaviMapu(mapElementId, markerElementId, callbackFunc, coordinateMarkera = null) {
-    var map = new ol.Map({
+function PostaviMapu(mapElementId, markerElementId, callbackFunc, coordinateMarkera = null, coordinateCentra = null, _zoom = 12) {
+  if (coordinateCentra == null) {
+    coordinateCentra = [2207181.56940382, 5661129.415474222];
+  }  
+  
+  var map = new ol.Map({
         layers: [
           new ol.layer.Tile({
             source: new ol.source.OSM()
@@ -13,8 +17,8 @@ function PostaviMapu(mapElementId, markerElementId, callbackFunc, coordinateMark
           }
         }),
         view: new ol.View({
-          center: [2207181.56940382, 5661129.415474222],    //ovo je NS
-          zoom: 12
+          center: coordinateCentra,    //ovo je NS
+          zoom: _zoom
         })
       });
     
@@ -41,6 +45,8 @@ function reverseGeocode(coords, originalCoords, callback) {
     .then(function(response) {
             return response.json();
         }).then(function(json) {
-            callback(json, originalCoords);
+            if (callback != null) {
+              callback(json, originalCoords);
+            }
         });
 }
