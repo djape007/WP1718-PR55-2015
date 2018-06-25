@@ -1,5 +1,5 @@
 
-function PostaviMapu(mapElementId, markerElementId, callbackFunc) {
+function PostaviMapu(mapElementId, markerElementId, callbackFunc, coordinateMarkera = null) {
     var map = new ol.Map({
         layers: [
           new ol.layer.Tile({
@@ -23,6 +23,10 @@ function PostaviMapu(mapElementId, markerElementId, callbackFunc) {
     });
 
     map.addOverlay(marker);
+
+    if (coordinateMarkera != null) {
+      marker.setPosition(coordinateMarkera);
+    }
     
     map.on('click', function(evt) {
         var coordianteRaw = evt.coordinate;

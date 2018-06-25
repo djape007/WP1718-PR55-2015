@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Butterfly+Kids');
+
 .mainHeaderContainer {
 	text-align: center;
 }
@@ -10,6 +12,11 @@
 	border-radius: 10px;
 	color: white;
 	margin-bottom: 10px;
+}
+
+#customFont {
+	font-size: 35px;
+	font-family: 'Butterfly Kids', cursive;
 }
 
 .header-container {

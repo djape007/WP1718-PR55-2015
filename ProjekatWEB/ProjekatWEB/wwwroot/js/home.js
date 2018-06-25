@@ -126,7 +126,7 @@ function DodajKarticuVozacKontrole() {
 	$("#btnVozaMojeVoznje").click(AjaxZahtevMojeVoznje);
 	$("#btnVozaVoznjeNaCekanju").click(PrikaziVoznjeNaCekanju);
 	$("#btnVozaMojeVozilo").click();
-	$("#btnVozaUpdateLokaciju").click();
+	$("#btnVozaUpdateLokaciju").click(PrikaziKarticuPostaviTrenLokaciju);
 }
 
 function PrikaziVoznjeNaCekanju() {
@@ -828,7 +828,7 @@ function PrikaziKarticuKreirajVoznju() {
 					$("body").addClass("KARTICANOVAVOZNJA");
 					DodajKarticu("Nova vožnja", KarticaNovaVoznjaHTMLSadrzaj(dataVozaci, dataKorisnici['Musterije']), true, KarticaNovaVoznjaCleanUp);
 					$("#btnNapraviNovuVoznju").click(btnNapraviVoznjuClick);
-					PostaviMapu("ovdeMapa", "ovoJeMarker", MapClickCallback);
+					PostaviMapu("ovdeMapaNovaVoznja", "markerNovaVoznja", MapClickCallback);
 				});
 			});
 		}
@@ -875,8 +875,8 @@ function KarticaNovaVoznjaHTMLSadrzaj(slobodniVozaci = null, musterije = null) {
 	"<input id='novVoznjaStartBroj' type='hidden'/>"+
 	"<input id='novVoznjaStartMesto' type='hidden'/>"+
 	"<input id='novVoznjaStartPostBr' type='hidden'/>"+
-	"<div id='ovdeMapa' class='mapaVisina'></div>"+
-	"<div id='ovoJeMarker'></div>"+
+	"<div id='ovdeMapaNovaVoznja' class='mapaVisina'></div>"+
+	"<div id='markerNovaVoznja' class='ovoJeMarker'></div>"+
 	"</div>"+
 	"<div class='col-12'>"+dodatneMogucnosti+"</div>"+
 	"<div class='col-12'><button class='dugme flotujDesno' id='btnNapraviNovuVoznju'>Napravi vožnju</button></div>";
@@ -970,6 +970,80 @@ function OtkaziVoznju() {
 	var voznja = $(this).parent().parent().parent();
 	var idVoznje = $(voznja).attr('idVoznje');
 	AjaxPostaviStatusVoznje(idVoznje, "Otkazana", function (obj) {
-		$(obj).replaceWith("<span>Vožnja je otkazana</span>");
-	}, this);
+		$(voznja).find(".otkaziVoznju").first().replaceWith("<span>Vožnja je otkazana</span>");
+		$(voznja).removeClass("voznjaKreirana");
+		$(voznja).addClass("voznjaOtkazana");
+		$(voznja).find(".voznjaStatus").first().text("Status: Otkazana");
+	}, voznja);
+}
+
+function PrikaziKarticuPostaviTrenLokaciju() {
+	if (ACC_TYPE == "Vozac" && !($("body").hasClass("KARTICATRENUTNAPOZICIJA"))) {
+		$.get("/api/Korisnici/GetLocation/" + ACCESS_TOKEN, {}, function (data) {
+			if (data == null) {
+				data = {
+					x: 0,
+					y: 0
+				}
+			}
+			$("body").addClass("KARTICATRENUTNAPOZICIJA");
+			DodajKarticu("Trenutna lokacija", $(NapraviHTMLPostaviTrenLokaciju()), true, function () { $("body").removeClass("KARTICATRENUTNAPOZICIJA")});
+			PostaviMapu("ovdeMapaTrenLok", "ovoJeMarkerTrenLok", PostaviTrenLokacijuMapCallback, [data.x, data.y]);
+			//$("#btnPostaviLokaciju").click(PostaviTrenLokaciju);
+		});
+	}
+}
+
+function NapraviHTMLPostaviTrenLokaciju() {
+	var s = 
+	"<div class='col-12'>"+
+	"<input id='trenLokacijaX' type='hidden'/>"+
+	"<input id='trenLokacijaY' type='hidden'/>"+
+	"<input id='trenLokacijaUlica' type='hidden'/>"+
+	"<input id='trenLokacijaBroj' type='hidden'/>"+
+	"<input id='trenLokacijaMesto' type='hidden'/>"+
+	"<input id='trenLokacijaPostBr' type='hidden'/>"+
+	"<div id='ovdeMapaTrenLok' class='mapaVisina'></div>"+
+	"<div id='ovoJeMarkerTrenLok' class='ovoJeMarker'></div>"+
+	"</div>";
+	//"<div class='col-12'><button class='dugme flotujDesno' id='btnPostaviLokaciju'>Postavi lokaciju</button></div>";
+	
+	return s;
+}
+
+function PostaviTrenLokacijuMapCallback(jsonData, originalCoords) {
+	$("#trenLokacijaX").val(originalCoords[0]);
+	$("#trenLokacijaY").val(originalCoords[1]);
+	$("#trenLokacijaUlica").val(jsonData["address"].road);
+	$("#trenLokacijaBroj").val(("house_number" in jsonData["address"]) ? jsonData["address"].house_number : -1);
+	$("#trenLokacijaMesto").val(("village" in jsonData["address"]) ? jsonData["address"].village : jsonData["address"].city );
+	$("#trenLokacijaPostBr").val(jsonData["address"].postcode);
+	
+	PostaviTrenLokaciju();
+}
+
+function PostaviTrenLokaciju() {
+	if (ACC_TYPE == "Vozac") {
+		var trenLokX = parseFloat($("#trenLokacijaX").val());
+		var trenLokY = parseFloat($("#trenLokacijaY").val());
+		var trenLokUlica = $("#trenLokacijaUlica").val();
+		var trenLokBroj = $("#trenLokacijaBroj").val();
+		var trenLokMesto = $("#trenLokacijaMesto").val();
+		var trenLokPostanskiBr = $("#trenLokacijaPostBr").val();
+
+		var startObj = NapraviObjekatLokacija(trenLokX, trenLokY, trenLokUlica, trenLokBroj, trenLokMesto, trenLokPostanskiBr);
+		AjaxPostaviTrenutnuLokaciju(startObj);
+	}
+}
+
+function AjaxPostaviTrenutnuLokaciju(objLokacija) {
+	if (ACC_TYPE == "Vozac") {
+		$.post("/api/Korisnici/SetLocation/" + ACCESS_TOKEN, {JSONLokacija: JSON.stringify(objLokacija)}, function (data) {
+			if (data.indexOf("ERROR_") != -1) {
+				DisplayError(data);
+			} else if (data.indexOf("OK") != -1) {
+				TOASTUJ("Nova lokacija je sačuvana");
+			}
+		});
+	}
 }
