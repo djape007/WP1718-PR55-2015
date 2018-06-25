@@ -16,6 +16,8 @@ const SORT_PRVO_STARO = 1;
 const SORT_PRVO_MIN_OCENA = 2;
 const SORT_PRVO_MAX_OCENA = 3;
 
+const POPUP_MAPA_VOZNJE_ZOOM = 13;
+
 function Init() {
 	UcitajPodatkeIzKolaca();
 }
@@ -130,8 +132,10 @@ function DodajKarticuVozacKontrole() {
 }
 
 function PrikaziVoznjeNaCekanju() {
-	if (ACC_TYPE === "Vozac") {
+	if (ACC_TYPE === "Vozac" && !(IMA_AKTIVNA_VOZNJA)) {
 		AjaxZahtevSveVoznje(NapraviFilter("Kreirana"));
+	} else if (IMA_AKTIVNA_VOZNJA) {
+		DisplayError("Prihvaćena/Formirana vožnja nije završena");
 	}
 }
 
@@ -144,6 +148,14 @@ function DodajKarticuPrikazVoznji(naslov, voznjeZaPrikaz, customIDkartice, filte
 	if (ACC_TYPE == "Musterija") {
 		for(var v in voznjeZaPrikaz) {
 			if (STATUS_VOZNJE_FROM_INT[voznjeZaPrikaz[v]['status']] == "Kreirana") {
+				IMA_AKTIVNA_VOZNJA = true;
+			}
+		}
+	}
+	//da li vozac ima voznju na kojoj je zaduzen (formirana ili prihvacena)
+	if (ACC_TYPE == "Vozac") {
+		for(var v in voznjeZaPrikaz) {
+			if (STATUS_VOZNJE_FROM_INT[voznjeZaPrikaz[v]['status']] == "Formirana" || STATUS_VOZNJE_FROM_INT[voznjeZaPrikaz[v]['status']] == "Prihvacena") {
 				IMA_AKTIVNA_VOZNJA = true;
 			}
 		}
@@ -406,12 +418,21 @@ function NapraviHTMLJedneVoznje(voznja) {
 	
 	var sviKomentari = NapraviHtmlSviKomentari(voznja['komentariOBJ']);
 	
-	var redDugmeOtkazi = ((mozeDaSeOtkaze) ? "<button class='dugme otkaziVoznju'>Otkaži</button></br>" : "<div>Otkazivanje nije moguće</div>");
-	if (STATUS_VOZNJE_FROM_INT[voznja['status']] == "Kreirana") {
-		if (ACC_TYPE == "Vozac") {
-			redDugmeOtkazi = "<button class='dugme prihvatiVoznju'>Prihvati vožnju</button></br>";
-		} else if (ACC_TYPE == "Dispecer") {
-			redDugmeOtkazi = "<button class='dugme dodeliVoznju'>Dodeli vožnju</button></br>";
+	var redDugmeDodatneKontrole = "<span>-</span></br>";
+
+	if (ACC_TYPE == "Vozac") {
+		if (STATUS_VOZNJE_FROM_INT[voznja['status']] == "Kreirana") {
+			redDugmeDodatneKontrole = "<button class='dugme prihvatiVoznju'>Prihvati vožnju</button></br>";
+		} else if (STATUS_VOZNJE_FROM_INT[voznja['status']] == "Prihvacena" || STATUS_VOZNJE_FROM_INT[voznja['status']] == "Obradjena" || STATUS_VOZNJE_FROM_INT[voznja['status']] == "Formirana") {
+			redDugmeDodatneKontrole = "<button class='dugme uspesnaVoznja'>Uspesna vožnja</button></br><button class='dugme neuspesnaVoznja'>Neuspesna vožnja</button></br>";
+		}
+	} else if (ACC_TYPE == "Dispecer") {
+		if (STATUS_VOZNJE_FROM_INT[voznja['status']] == "Kreirana") {
+			redDugmeDodatneKontrole = "<button class='dugme dodeliVoznju'>Dodeli vožnju</button></br>";
+		}
+	} else if (ACC_TYPE == "Musterija") {
+		if (STATUS_VOZNJE_FROM_INT[voznja['status']] == "Kreirana") {
+			redDugmeDodatneKontrole = ((mozeDaSeOtkaze) ? "<button class='dugme otkaziVoznju'>Otkaži</button></br>" : "<div>Otkazivanje nije moguće</div>");
 		}
 	}
 	
@@ -419,7 +440,7 @@ function NapraviHTMLJedneVoznje(voznja) {
 				"<div class='col-12'>"+
 					"<div class='col-3 centriraj'>"+
 						"<span class='idVoznje'>ID: "+voznja['id']+"</span></br>"+
-						redDugmeOtkazi+
+						redDugmeDodatneKontrole+
 						"<button class='dugme btnPrikaziKomentare'>Prikaži komentare"+ ((voznja['komentariOBJ'].length > 0) ? " ("+voznja['komentariOBJ'].length.toString()+")" : "") +"</button>"+
 						"<button class='dugme btnSakrijKomentare'>Zatvori komentare</button>"+
 					"</div>"+
@@ -428,7 +449,7 @@ function NapraviHTMLJedneVoznje(voznja) {
 						"<div class='col-6'>" +vozacDispecerInfo+"</div>"+
 					"</div>"+
 				"</div>"+
-				"<div class='col-12 lokacijaJedneVoznje' lokX='"+voznja['pocetnaLokacija']["x"]+"' lokY='"+voznja['pocetnaLokacija']["y"]+"'>Lokacija: "+ voznja['pocetnaLokacija']['adresa']['mesto'] + ", " + voznja['pocetnaLokacija']['adresa']['ulica'] + " "+ voznja['pocetnaLokacija']['adresa']['broj'] +"</div>"+
+				"<div class='col-12'><span class='lokacijaJedneVoznje' lokX='"+voznja['pocetnaLokacija']["x"]+"' lokY='"+voznja['pocetnaLokacija']["y"]+"'>Lokacija: "+ voznja['pocetnaLokacija']['adresa']['mesto'] + ", " + voznja['pocetnaLokacija']['adresa']['ulica'] + " "+ voznja['pocetnaLokacija']['adresa']['broj'] +"</span></div>"+
 				"<div class='col-12 sviKomentari centriraj'>"+
 					sviKomentari+
 				"</div>"+
@@ -443,7 +464,7 @@ function PopUpLokacijaVoznje() {
 	
 	$("#mapaLokacijaVoznje").show();
 	var koordinate = [parseFloat($(this).attr("LokX")), parseFloat($(this).attr("LokY"))];
-	PostaviMapu("tmpMapa", "tmpMarker", null, koordinate, koordinate, 14);
+	PostaviMapu("tmpMapa", "tmpMarker", null, koordinate, koordinate, POPUP_MAPA_VOZNJE_ZOOM);
 }
 
 function PopUpMouseOut() {
@@ -513,6 +534,13 @@ function DodajKomentar() {
 		return;
 	}
 
+	AjaxNoviKomentar(_komentar, ACC_ID, _voznjaId, _ocena, function () {
+		TOASTUJ("Komentar je dodat");
+		$(voznja).find(".noviKomentarOpis").first().val("")
+	});
+}
+
+function AjaxNoviKomentar(_komentar, _autorId, _voznjaId, _ocena, callbackFunc = null, param1 = null) {
 	$.post("/api/Komentari/" + ACCESS_TOKEN, {
 		komentar: _komentar,
 		autorId: ACC_ID,
@@ -522,8 +550,9 @@ function DodajKomentar() {
 		if (data.indexOf("ERROR_") != -1) {
 			DisplayError(data);
 		} else if (data.indexOf("OK_") != -1) {
-			TOASTUJ("Komentar je dodat");
-			$(voznja).find(".noviKomentarOpis").first().val("")
+			if (callbackFunc != null) {
+				callbackFunc(param1);
+			}
 		}
 	});
 }
@@ -742,6 +771,8 @@ function AjaxZahtevSveVoznje(filter = null, sort = null) {
 				}
 			}
 		}); 
+	} else if ($("body").hasClass("PRIKAZANEVOZNJEKARTICA")) {
+		DisplayError("Kartica sa vožnjama je već otvorena");
 	}
 }
 
@@ -967,6 +998,9 @@ function btnNapraviVoznjuClick() {
 			DisplayError(data);
 		} else if (data.indexOf("OK_") != -1 ) {
 			TOASTUJ("Vožnja je kreirana");
+			if (ACC_TYPE == "Musterija") {
+				IMA_AKTIVNA_VOZNJA = true;
+			}
 		}
 	});
 }
@@ -991,6 +1025,8 @@ function OtkaziVoznju() {
 		$(voznja).removeClass("voznjaKreirana");
 		$(voznja).addClass("voznjaOtkazana");
 		$(voznja).find(".voznjaStatus").first().text("Status: Otkazana");
+		IMA_AKTIVNA_VOZNJA = false;
+		PrikaziDialogNoviKomentar(idVoznje);
 	}, voznja);
 }
 
@@ -1063,4 +1099,60 @@ function AjaxPostaviTrenutnuLokaciju(objLokacija) {
 			}
 		});
 	}
+}
+
+function PrikaziDialog(naslov, mozeDaSeUgasi, sadrzajDijaloga) {
+	if (!($("body").hasClass("PRIKAZANDIJALOG"))) {
+		$("body").addClass("PRIKAZANDIJALOG");
+		$("#dialogNaslov").text(naslov);
+
+		if (mozeDaSeUgasi) {
+			DijalogMozeDaSeUgasi();
+		}
+
+		$("#dialogTelo").append(sadrzajDijaloga);
+
+		$("#customDialog").show();
+		$("#zatamljenje").show();
+	}
+}
+
+function DijalogMozeDaSeUgasi() {
+	$("#zatamljenje").click(ZatvoriDijalog);
+}
+
+function ZatvoriDijalog() {
+	$("body").removeClass("PRIKAZANDIJALOG");
+	$("#customDialog").hide();
+	$("#zatamljenje").hide();
+	$("#dialogNaslov").text("");
+	$("#dialogTelo").empty();
+	$("#zatamljenje").click(function () {});
+}
+
+function PrikaziDialogNoviKomentar(idVoznje) {
+	PrikaziDialog("Obavezan komentar", false, $(NapraviHTMLOtkazanaVoznjaDialog()));
+
+	$("#diagNovKomBtn").click(function () {
+		var _komentar = $("#diagNovKomOpis").val();
+		var _ocena = $("#diagNovKomOcena").val();
+
+		if (_komentar.trim() == "") {
+			DisplayError("Komentar ne sme biti prazan");
+			return;
+		}
+
+		AjaxNoviKomentar(_komentar, ACC_ID, idVoznje, _ocena, function () {
+			TOASTUJ("Komentar je dodat");
+			ZatvoriDijalog();
+		});
+	});
+}
+
+function NapraviHTMLOtkazanaVoznjaDialog() {
+	var s = "<div>Komentar: <input id='diagNovKomOpis' type='text'></br>"+
+	"Ocena: <select id='diagNovKomOcena'><option value='0'>Bez ocene</option><option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option><option value='5'>5</option></select></br>"+
+	"<div class='col-12'><button class='dugme flotujDesno' id='diagNovKomBtn'>Dodaj komentar</button></div></div>";
+
+	return s;
 }

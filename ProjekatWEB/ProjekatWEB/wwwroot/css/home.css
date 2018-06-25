@@ -170,6 +170,38 @@ table {
 	display: none;
 }
 
+#customDialog {
+	width: 550px;
+	min-height: 270px;
+	z-index: 10;
+	position: fixed;
+	left: calc(50% - 275px);
+	top: 170px;
+	background-color: #995f8b;
+	box-shadow: 0 0 20px 0px;
+	display: none;
+}
+
+#zatamljenje {
+	z-index: 5;
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	background-color: rgba(0, 0, 0, 0.5);
+	display: none;
+}
+
+#dialogNaslov {
+	color: white;
+	padding: 5px;
+	font-size: 18px;
+	border-bottom: 2px solid black;
+}
+
+#dialogTelo {
+	padding: 5px;
+}
+
 @media only screen and (max-width: 1165px) {
 	.pocLokacija {
 		width: 100%;
