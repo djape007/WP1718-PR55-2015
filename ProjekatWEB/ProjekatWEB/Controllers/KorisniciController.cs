@@ -157,20 +157,17 @@ namespace ProjekatWEB.Controllers
             }
         }
 
-        [Route("[action]/{id}/{token}")]
+        [HttpPost("[action]/{id}/{token}")]
         public JsonResult Toggle(int id, string token) {
             if (Authorize.IsAllowedToAccess(token, TipNaloga.Dispecer)) {
-                if (id > 0) {
-                    Korisnik k = MainStorage.Instanca.NadjiKorisnikaPoId(id);
-                    if (k != null) {
-                        k.AktivanNalog = !k.AktivanNalog;
-                        MainStorage.Instanca.UpdateKorisnika(k);
-                        return Json("OK_" + k.AktivanNalog.ToString());
-                    } else {
-                        return Json("ERROR_ID_NOT_VALID");
-                    }
+                Korisnik k = MainStorage.Instanca.NadjiKorisnikaPoId(id);
+                if (k != null) {
+                    k.AktivanNalog = !k.AktivanNalog;
+                    MainStorage.Instanca.UpdateKorisnika(k);
+                    Authorize.RemoveAllAccess(k.ID);
+                    return Json("OK_" + k.AktivanNalog.ToString());
                 } else {
-                    return Json("ERROR_ID_NOT_VALID");
+                    return Json("ERROR_USER_ID_NOT_VALID");
                 }
             } else {
                 return Helper.ForbidenAccessJson();
