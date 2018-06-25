@@ -115,6 +115,7 @@ function DodajKarticuDispecerKontrole() {
 	$("#btnDispNovaVoznja").click(PrikaziKarticuKreirajVoznju);
 	$("#btnDispMojeVoznje").click(AjaxZahtevMojeVoznje);
 	$("#btnDispSveVoznje").click(AjaxZahtevSveVoznje);
+	$("#btnDispSveKorisnike").click(DodajKarticuPrikaziSveKorisnike);
 }
 
 function DodajKarticuMusterijaKontrole() {
@@ -1155,4 +1156,70 @@ function NapraviHTMLOtkazanaVoznjaDialog() {
 	"<div class='col-12'><button class='dugme flotujDesno' id='diagNovKomBtn'>Dodaj komentar</button></div></div>";
 
 	return s;
+}
+
+function DodajKarticuPrikaziSveKorisnike() {
+	if (!($("body").hasClass("KARTICASVIKORISNICI")) && ACC_TYPE == "Dispecer") {
+		$.get("/api/Korisnici/" + ACCESS_TOKEN, {}, function (data) {
+			var sadrzaj = 
+			"<h4>Mušterije ("+data["Musterije"].length+"):</h4>"+
+			NapraviHTMLSviKorisnici(data["Musterije"]) +
+			"<h4>Vozači ("+data["Vozaci"].length+"):</h4>"+
+			NapraviHTMLSviKorisnici(data["Vozaci"]) +
+			"<h4>Dispečeri ("+data["Dispeceri"].length+"):</h4>"+
+			NapraviHTMLSviKorisnici(data["Dispeceri"]);
+
+			$("body").addClass("KARTICASVIKORISNICI");
+			DodajKarticu("Svi korisnici", $(sadrzaj), true, function () {
+				$("body").removeClass("KARTICASVIKORISNICI");
+			});
+			$(".btnToggleUser").click(ToggleNalog);
+		});
+	}
+}
+
+function NapraviHTMLSviKorisnici(korisnici) {
+	var htmlSvi = "";
+	if (korisnici == null || korisnici.length == 0) {
+		htmlSvi = "<div col-12>Nema korisnika</div>";
+	} else {
+		for (var k in korisnici) {
+			var korisnik = korisnici[k];
+			htmlSvi += "<div class='col-6 jedanKorisnik' korisnikId='"+korisnik['id']+"'>"+
+				"<div class='col-12'><span>"+korisnik['username']+ " ("+ korisnik['ime'] + " " + korisnik['prezime'] + ")" +"</span></div>"+
+				"<div class='col-12'><span class='statusNaloga'>Status: "+((korisnik['aktivanNalog']) ? "Aktivan" : "Isključen")+"</span><button class='dugme flotujDesno btnToggleUser'>ON/OFF</button></div>"+
+			"</div>";
+		}
+	}
+	return "<div class='col-12'>"+htmlSvi+"</div>";
+}
+
+function ToggleNalog() {
+	if (ACC_TYPE == "Dispecer") {
+		var korisnikKontejner = $(this).parent().parent();
+		var status = $(korisnikKontejner).find(".statusNaloga").first();
+		var idKorisnika = $(korisnikKontejner).attr("korisnikId");
+		AjaxToggleNalog(idKorisnika, function (data) {
+			var novoStanje = data.split("_")[1];
+			if (novoStanje == "True") {
+				$(status).text("Status: Aktivan");
+			} else {
+				$(status).text("Status: Isključen");
+			}
+		});
+	}
+}
+
+function AjaxToggleNalog(idKorisnika, callbackFunc = null, cbFuncParam1 = null) {
+	if (ACC_TYPE == "Dispecer") {
+		$.post("/api/Korisnici/Toggle/" + idKorisnika + "/" + ACCESS_TOKEN, {}, function (data) {
+			if (data.indexOf("ERROR_") != -1) {
+				DisplayError(data);
+			} else if (data.indexOf("OK_") != -1) {
+				if (callbackFunc != null) {
+					callbackFunc(data, cbFuncParam1);
+				}
+			}
+		});
+	}
 }
