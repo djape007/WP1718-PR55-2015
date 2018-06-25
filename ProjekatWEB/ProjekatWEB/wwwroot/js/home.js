@@ -125,6 +125,8 @@ function DodajKarticuVozacKontrole() {
 	DodajKarticu("Ostale kontrole", NapraviHTMLVozacKontrole(), false);
 	$("#btnVozaMojeVoznje").click(AjaxZahtevMojeVoznje);
 	$("#btnVozaVoznjeNaCekanju").click(PrikaziVoznjeNaCekanju);
+	$("#btnVozaMojeVozilo").click();
+	$("#btnVozaUpdateLokaciju").click();
 }
 
 function PrikaziVoznjeNaCekanju() {
@@ -135,8 +137,10 @@ function PrikaziVoznjeNaCekanju() {
 
 function DodajKarticuPrikazVoznji(naslov, voznjeZaPrikaz, customIDkartice, filter = null, sort = null) {
 	console.log(voznjeZaPrikaz);
+
 	SVE_PRIKAZANE_VOZNJE = voznjeZaPrikaz;
 	//da li korisnik ima aktivnu voznju (koja moze da se otkaze)
+	IMA_AKTIVNA_VOZNJA = false;
 	if (ACC_TYPE == "Musterija") {
 		for(var v in voznjeZaPrikaz) {
 			if (STATUS_VOZNJE_FROM_INT[voznjeZaPrikaz[v]['status']] == "Kreirana") {
@@ -422,6 +426,7 @@ function NapraviHTMLJedneVoznje(voznja) {
 						"<div class='col-6'>" +vozacDispecerInfo+"</div>"+
 					"</div>"+
 				"</div>"+
+				"<div class='col-12'>Lokacija: "+ voznja['pocetnaLokacija']['adresa']['mesto'] + ", " + voznja['pocetnaLokacija']['adresa']['ulica'] + " "+ voznja['pocetnaLokacija']['adresa']['broj'] +"</div>"+
 				"<div class='col-12 sviKomentari centriraj'>"+
 					sviKomentari+
 				"</div>"+
@@ -524,8 +529,9 @@ function NapraviHTMLMusterijaKontrole() {
 }
 
 function NapraviHTMLVozacKontrole() {
-	var s = 	"<button class='dugme' id='btnVozaVoznjeNaCekanju'>Prikaži vožnje na cekanju</button>"+
+	var s = 	"<button class='dugme' id='btnVozaVoznjeNaCekanju'>Prikaži vožnje na čekanju</button>"+
 			"<button class='dugme' id='btnVozaUpdateLokaciju'>Postavi trenutnu lokaciju</button>"+
+			"<button class='dugme' id='btnVozaMojeVozilo'>Moje vozilo</button>"+
 			"<button class='dugme' id='btnVozaMojeVoznje'>Moje vožnje</button>";
 	var $s = $(s);
 	return $s;
@@ -815,12 +821,14 @@ function PrikaziKarticuKreirajVoznju() {
 			$("body").addClass("KARTICANOVAVOZNJA");
 			DodajKarticu("Nova vožnja", KarticaNovaVoznjaHTMLSadrzaj(), true, KarticaNovaVoznjaCleanUp);
 			$("#btnNapraviNovuVoznju").click(btnNapraviVoznjuClick);
+			PostaviMapu("ovdeMapa", "ovoJeMarker", MapClickCallback);
 		} else if (ACC_TYPE == "Dispecer") {
 			$.get("/api/Korisnici/AvailableDrivers/" + ACCESS_TOKEN, {}, function (dataVozaci) {
 				$.get("/api/Korisnici/" + ACCESS_TOKEN, {}, function (dataKorisnici) {
 					$("body").addClass("KARTICANOVAVOZNJA");
 					DodajKarticu("Nova vožnja", KarticaNovaVoznjaHTMLSadrzaj(dataVozaci, dataKorisnici['Musterije']), true, KarticaNovaVoznjaCleanUp);
 					$("#btnNapraviNovuVoznju").click(btnNapraviVoznjuClick);
+					PostaviMapu("ovdeMapa", "ovoJeMarker", MapClickCallback);
 				});
 			});
 		}
@@ -837,7 +845,11 @@ function KarticaNovaVoznjaHTMLSadrzaj(slobodniVozaci = null, musterije = null) {
 		} else {
 			inputVozaci = "<select id='novVoznjaSlobVozacID'>";
 			for (var voz in slobodniVozaci) {
-				inputVozaci += "<option value='"+slobodniVozaci[voz]['id']+"'>"+slobodniVozaci[voz]['username'] + "</option>";
+				var voziloINFO = "Nema vozilo";
+				if (slobodniVozaci[voz]['automobilOBJ'] != null) {
+					voziloINFO = TIP_VOZILA_FROM_INT[slobodniVozaci[voz]['automobilOBJ']['tipAutomobila']];
+				}
+				inputVozaci += "<option value='"+slobodniVozaci[voz]['id']+"'>"+ slobodniVozaci[voz]['username'] + " (" + voziloINFO + ")" + "</option>";
 			}
 			inputVozaci += "</select>";
 		}
@@ -855,15 +867,18 @@ function KarticaNovaVoznjaHTMLSadrzaj(slobodniVozaci = null, musterije = null) {
 		"</tbody></table>";
 	}
 	
-	var s = "<div class='col-12'>Potrebno vozilo:<select id='novVoznjaTipVozila'><option value='PutnickiAuto'>Auto</option><option value='Kombi'>Kombi</option></select></div><div class='col-6 pocLokacija'><h3>Početna lokacija:</h3><table><tbody>"+
-	"<tr><td><span class='propName'>X</span></td>			<td><input id='novVoznjaStartX' type='text'/></td></tr>"+
-	"<tr><td><span class='propName'>Y</span></td>			<td><input id='novVoznjaStartY' type='text'/></td></tr>"+
-	"<tr><td><span class='propName'>Ulica</span></td>			<td><input id='novVoznjaStartUlica' type='text'/></td></tr>"+
-	"<tr><td><span class='propName'>Broj</span></td>			<td><input id='novVoznjaStartBroj' type='text'/></td></tr>"+
-	"<tr><td><span class='propName'>Mesto</span></td>			<td><input id='novVoznjaStartMesto' type='text'/></td></tr>"+
-	"<tr><td><span class='propName'>Poštanski broj</span></td>	<td><input id='novVoznjaStartPostBr' type='text'/></td></tr>"+
-	"</tbody></table></div>"+
-	"<div class='col-6 destLokacija'>"+dodatneMogucnosti+"</div>"+
+	var s = "<div class='col-12'>Potrebno vozilo:<select id='novVoznjaTipVozila'><option value='PutnickiAuto'>Auto</option><option value='Kombi'>Kombi</option></select></div>"+
+	"<div class='col-12'><h3>Početna lokacija:</h3>"+
+	"<input id='novVoznjaStartX' type='hidden'/>"+
+	"<input id='novVoznjaStartY' type='hidden'/>"+
+	"<input id='novVoznjaStartUlica' type='hidden'/>"+
+	"<input id='novVoznjaStartBroj' type='hidden'/>"+
+	"<input id='novVoznjaStartMesto' type='hidden'/>"+
+	"<input id='novVoznjaStartPostBr' type='hidden'/>"+
+	"<div id='ovdeMapa' class='mapaVisina'></div>"+
+	"<div id='ovoJeMarker'></div>"+
+	"</div>"+
+	"<div class='col-12'>"+dodatneMogucnosti+"</div>"+
 	"<div class='col-12'><button class='dugme flotujDesno' id='btnNapraviNovuVoznju'>Napravi vožnju</button></div>";
 	
 	return $(s);
@@ -871,6 +886,17 @@ function KarticaNovaVoznjaHTMLSadrzaj(slobodniVozaci = null, musterije = null) {
 
 function KarticaNovaVoznjaCleanUp() {
 	$("body").removeClass("KARTICANOVAVOZNJA");
+}
+
+function MapClickCallback(jsonData, originalCoords) {
+	console.log(jsonData["address"]);
+
+	$("#novVoznjaStartX").val(originalCoords[0]);
+	$("#novVoznjaStartY").val(originalCoords[1]);
+	$("#novVoznjaStartUlica").val(jsonData["address"].road);
+	$("#novVoznjaStartBroj").val(("house_number" in jsonData["address"]) ? jsonData["address"].house_number : -1);
+	$("#novVoznjaStartMesto").val(("village" in jsonData["address"]) ? jsonData["address"].village : jsonData["address"].city );
+	$("#novVoznjaStartPostBr").val(jsonData["address"].postcode);
 }
 
 function btnNapraviVoznjuClick() {

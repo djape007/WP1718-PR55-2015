@@ -149,6 +149,19 @@ table {
 	margin-bottom: 6px;
 }
 
+#ovoJeMarker {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background-color: #5c0b48;
+	margin-left: -50%;
+	margin-top: -50%; 
+}
+
+.mapaVisina {
+	height: 370px;
+}
+
 @media only screen and (max-width: 1165px) {
 	.pocLokacija {
 		width: 100%;
