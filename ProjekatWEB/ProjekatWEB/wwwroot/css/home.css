@@ -162,6 +162,14 @@ table {
 	height: 370px;
 }
 
+#mapaLokacijaVoznje {
+	width: 300px;
+	height: 250px;
+	background-color: white;
+	position: absolute;
+	display: none;
+}
+
 @media only screen and (max-width: 1165px) {
 	.pocLokacija {
 		width: 100%;

@@ -155,6 +155,7 @@ function DodajKarticuPrikazVoznji(naslov, voznjeZaPrikaz, customIDkartice, filte
 		$(".btnPrikaziKomentare").click(TogglePrikaziKomentareVoznje);
 		$(".btnSakrijKomentare").click(TogglePrikaziKomentareVoznje);
 		$(".otkaziVoznju").click(OtkaziVoznju);
+		$(".lokacijaJedneVoznje").mouseover(PopUpLokacijaVoznje).mouseout(PopUpMouseOut);
 		$(".DodajKomentar").click(DodajKomentar);
 		$("#btnFiltriraj").click(BtnFiltrirajClick);
 		jQuery('#dtpickOD').datetimepicker({
@@ -337,6 +338,7 @@ function BtnFiltrirajClick() {
 	$nesto.find("#ovoZameniPrilikomPrimeneFilteraSorta").replaceWith(NapraviHTMLSveVoznje(SVE_PRIKAZANE_VOZNJE, filter, _SORT));
 	$(".btnPrikaziKomentare").click(TogglePrikaziKomentareVoznje);
 	$(".btnSakrijKomentare").click(TogglePrikaziKomentareVoznje);
+	$(".lokacijaJedneVoznje").mouseover(PopUpLokacijaVoznje).mouseout(PopUpMouseOut);
 	$(".otkaziVoznju").click(OtkaziVoznju);
 	$(".DodajKomentar").click(DodajKomentar);
 	TOASTUJ("Filter je primenjen!");
@@ -426,12 +428,27 @@ function NapraviHTMLJedneVoznje(voznja) {
 						"<div class='col-6'>" +vozacDispecerInfo+"</div>"+
 					"</div>"+
 				"</div>"+
-				"<div class='col-12'>Lokacija: "+ voznja['pocetnaLokacija']['adresa']['mesto'] + ", " + voznja['pocetnaLokacija']['adresa']['ulica'] + " "+ voznja['pocetnaLokacija']['adresa']['broj'] +"</div>"+
+				"<div class='col-12 lokacijaJedneVoznje' lokX='"+voznja['pocetnaLokacija']["x"]+"' lokY='"+voznja['pocetnaLokacija']["y"]+"'>Lokacija: "+ voznja['pocetnaLokacija']['adresa']['mesto'] + ", " + voznja['pocetnaLokacija']['adresa']['ulica'] + " "+ voznja['pocetnaLokacija']['adresa']['broj'] +"</div>"+
 				"<div class='col-12 sviKomentari centriraj'>"+
 					sviKomentari+
 				"</div>"+
 			"</div>";
 	return s;
+}
+
+function PopUpLokacijaVoznje() {
+	$("#mapaLokacijaVoznje").css("top", $(this).offset().top - 260);
+	$("#mapaLokacijaVoznje").css("left", $(this).offset().left - 50);
+	$("#mapaLokacijaVoznje").append("<div id='tmpMapa'></div><div class='ovoJeMarker' id='tmpMarker'></div>");
+	
+	$("#mapaLokacijaVoznje").show();
+	var koordinate = [parseFloat($(this).attr("LokX")), parseFloat($(this).attr("LokY"))];
+	PostaviMapu("tmpMapa", "tmpMarker", null, koordinate, koordinate, 14);
+}
+
+function PopUpMouseOut() {
+	$("#mapaLokacijaVoznje").hide();
+	$("#mapaLokacijaVoznje").empty();
 }
 
 function TogglePrikaziKomentareVoznje() {
@@ -821,7 +838,7 @@ function PrikaziKarticuKreirajVoznju() {
 			$("body").addClass("KARTICANOVAVOZNJA");
 			DodajKarticu("Nova vožnja", KarticaNovaVoznjaHTMLSadrzaj(), true, KarticaNovaVoznjaCleanUp);
 			$("#btnNapraviNovuVoznju").click(btnNapraviVoznjuClick);
-			PostaviMapu("ovdeMapa", "ovoJeMarker", MapClickCallback);
+			PostaviMapu("ovdeMapaNovaVoznja", "markerNovaVoznja", MapClickCallback);
 		} else if (ACC_TYPE == "Dispecer") {
 			$.get("/api/Korisnici/AvailableDrivers/" + ACCESS_TOKEN, {}, function (dataVozaci) {
 				$.get("/api/Korisnici/" + ACCESS_TOKEN, {}, function (dataKorisnici) {
