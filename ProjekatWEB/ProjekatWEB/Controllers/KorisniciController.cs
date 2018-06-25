@@ -193,7 +193,26 @@ namespace ProjekatWEB.Controllers
                             return Json("ERROR_JSON_LOCATION_FORMAT_NOT_CORRECT");
                         }
                     } else {
-                        return Json("ERROR_ID_NOT_VALID");
+                        return Json("ERROR_DRIVER_DOES_NOT_EXIST");
+                    }
+                } else {
+                    return Json("ERROR_ID_NOT_VALID");
+                }
+            } else {
+                return Helper.ForbidenAccessJson();
+            }
+        }
+
+        [HttpGet("[action]/{token}")]
+        public JsonResult GetLocation(string token) {
+            if (Authorize.IsAllowedToAccess(token, TipNaloga.Vozac)) {
+                int id = Korisnik.GetIDFromToken(token);
+                if (id > 0) {
+                    Vozac k = MainStorage.Instanca.Vozaci.FirstOrDefault(x => x.ID == id);
+                    if (k != null) {
+                        return Json(k.TrenutnaLokacija);
+                    } else {
+                        return Json("ERROR_DRIVER_DOES_NOT_EXIST");
                     }
                 } else {
                     return Json("ERROR_ID_NOT_VALID");
