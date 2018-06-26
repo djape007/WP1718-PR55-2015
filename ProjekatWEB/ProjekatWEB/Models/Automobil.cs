@@ -19,14 +19,21 @@ namespace ProjekatWEB
             }
 
             set {
-                if (postojeciBrojVozila.Contains(value.ToLower())) {
-                    throw new Exception("Vec postoji auto sa tim brojem");
-                } else {
-                    postojeciBrojVozila.Add(value.ToLower());
-                    brojVozila = value.ToLower();
+                if (brojVozila != null && postojeciBrojVozila.Contains(brojVozila.ToLower())) {
+                    postojeciBrojVozila.Remove(brojVozila.ToLower());
                 }
+
+                postojeciBrojVozila.Add(value.ToLower());
+                brojVozila = value.ToLower();
             }
         }
         public TipAutomobila TipAutomobila { get; set; }
+
+        public static bool ZauzetBrojVozila(string brVozila) {
+            if (postojeciBrojVozila.Contains(brVozila.ToLower())) {
+                return true;
+            }
+            return false;
+        }
     }
 }

@@ -29,6 +29,9 @@ namespace ProjekatWEB
                 return username;
             }
             set {
+                if (username != null && postojeciUsernameovi.Contains(username.ToLower())) {
+                    postojeciUsernameovi.Remove(username);
+                }
                 username = value.ToLower();
                 postojeciUsernameovi.Add(value.ToLower());
             }
@@ -98,12 +101,6 @@ namespace ProjekatWEB
                 return false;
             }
             return true;
-        }
-
-        public static void RemoveUsernameInUse(string username) {
-            if (postojeciUsernameovi.Contains(username.ToLower())) {
-                postojeciUsernameovi.Remove(username.ToLower());
-            }
         }
     }
 }

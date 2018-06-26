@@ -128,7 +128,7 @@ function DodajKarticuVozacKontrole() {
 	DodajKarticu("Ostale kontrole", NapraviHTMLVozacKontrole(), false);
 	$("#btnVozaMojeVoznje").click(AjaxZahtevMojeVoznje);
 	$("#btnVozaVoznjeNaCekanju").click(PrikaziVoznjeNaCekanju);
-	$("#btnVozaMojeVozilo").click();
+	$("#btnVozaMojeVozilo").click(DodajKarticuMojAutomobil);
 	$("#btnVozaUpdateLokaciju").click(PrikaziKarticuPostaviTrenLokaciju);
 }
 
@@ -1218,6 +1218,66 @@ function AjaxToggleNalog(idKorisnika, callbackFunc = null, cbFuncParam1 = null) 
 			} else if (data.indexOf("OK_") != -1) {
 				if (callbackFunc != null) {
 					callbackFunc(data, cbFuncParam1);
+				}
+			}
+		});
+	}
+}
+
+function DodajKarticuMojAutomobil() {
+	if (ACC_TYPE == "Vozac") {
+		$("body").addClass("KARTICAMOJAUTOMOBIL");
+		var sadrzaj = "";
+
+		if (KORISNIK['automobilOBJ'] == null) {	//ako vozac nema auto
+			sadrzaj = 
+			"<h4>Dodaj automobil:</h4>"+
+			"<span>Broj vozila: </span><input type='text' id='noviAutoBrojVozila'></br>"+
+			"<span>Godište:</span><input type='text' id='noviAutoGodiste'></br>"+
+			"<span>Tip:</span><select id='noviAutoTipVozila'><option value='PutnickiAuto'>Auto</option><option value='Kombi'>Kombi</option></select></br>"+
+			"<div class='col-12'><button class='dugme flotujDesno' id='btnDodajNoviAuto'>Dodaj auto</button></div>";
+		} else {	//vozac ima auto
+			sadrzaj = 
+			"<span>Broj vozila: </span><span>"+KORISNIK['automobilOBJ']['brojVozila']+"</span></br>"+
+			"<span>Godište:</span><span>"+KORISNIK['automobilOBJ']['godisteAutomobila']+"</span></br>"+
+			"<span>Tip:</span><span>"+TIP_VOZILA_FROM_INT[KORISNIK['automobilOBJ']['tipAutomobila']]+"</span></br>";
+		}
+
+		DodajKarticu("Moj autmobil", $("<div class='col-12'>"+sadrzaj+"</div>"), true, function () { $("body").removeClass("KARTICAMOJAUTOMOBIL")});
+		$("#btnDodajNoviAuto").click(DodajAutoBtnClick);
+	}
+}
+
+function DodajAutoBtnClick() {
+	var godiste = parseInt($("#noviAutoGodiste").val());
+	var brojVozila = $("#noviAutoBrojVozila").val();
+	var tipVozila = $("#noviAutoTipVozila").val();
+
+	if (isNaN(godiste)) {
+		DisplayError("Godište mora biti broj");
+		return;
+	}
+
+	if (brojVozila.trim().length == 0) {
+		DisplayError("Broj vozila mora biti unet");
+		return;
+	}
+
+	AjaxDodajAuto(brojVozila,godiste, tipVozila, ACC_ID, function () {
+		TOASTUJ("Auto je dodat");
+		//da bi se updateovali podaci korisnika jer je auto dodat
+		AjaxGetKorisnika(ACC_ID, false);
+	});
+}
+
+function AjaxDodajAuto(_brojVozila, _godiste, _tip, _idVozaca, callbackFunc = null) {
+	if (ACC_TYPE == "Vozac") {
+		$.post("/api/Automobili/" + ACCESS_TOKEN, {brojVozila: _brojVozila, godiste: _godiste, tip: _tip, idVozaca: _idVozaca}, function (data) {
+			if (data.indexOf("ERROR_") != -1) {
+				DisplayError(data);
+			} else if (data.indexOf("OK") != -1) {
+				if (callbackFunc != null) {
+					callbackFunc();
 				}
 			}
 		});
