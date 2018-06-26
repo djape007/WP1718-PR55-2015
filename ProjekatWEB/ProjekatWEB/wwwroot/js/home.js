@@ -15,6 +15,7 @@ const SORT_PRVO_NOVO = 0;
 const SORT_PRVO_STARO = 1;
 const SORT_PRVO_MIN_OCENA = 2;
 const SORT_PRVO_MAX_OCENA = 3;
+const SORT_PRVO_NAJBLIZE_VOZNJE = 4;
 
 const POPUP_MAPA_VOZNJE_ZOOM = 13;
 
@@ -165,11 +166,7 @@ function DodajKarticuPrikazVoznji(naslov, voznjeZaPrikaz, customIDkartice, filte
 	if (!($("body").hasClass(customIDkartice))) {
 		$("body").addClass(customIDkartice);
 		DodajKarticu(naslov, NapraviHTMLVoznjeKartica(voznjeZaPrikaz, filter, sort),true, function() { $("body").removeClass(customIDkartice); });
-		$(".btnPrikaziKomentare").click(TogglePrikaziKomentareVoznje);
-		$(".btnSakrijKomentare").click(TogglePrikaziKomentareVoznje);
-		$(".otkaziVoznju").click(OtkaziVoznju);
-		$(".lokacijaJedneVoznje").mouseover(PopUpLokacijaVoznje).mouseout(PopUpMouseOut);
-		$(".DodajKomentar").click(DodajKomentar);
+		InitBtnsZaVoznje();
 		$("#btnFiltriraj").click(BtnFiltrirajClick);
 		jQuery('#dtpickOD').datetimepicker({
 			//format: 'Y-m-d H',
@@ -180,6 +177,63 @@ function DodajKarticuPrikazVoznji(naslov, voznjeZaPrikaz, customIDkartice, filte
 			step: 10
 		});
 	}
+}
+
+function InitBtnsZaVoznje() {
+	$(".btnPrikaziKomentare").click(TogglePrikaziKomentareVoznje);
+	$(".btnSakrijKomentare").click(TogglePrikaziKomentareVoznje);
+	$(".otkaziVoznju").click(OtkaziVoznju);
+	$(".lokacijaJedneVoznje").mouseover(PopUpLokacijaVoznje).mouseout(PopUpMouseOut);
+	$(".DodajKomentar").click(DodajKomentar);
+	$(".neuspesnaVoznja").click(NeuspsnaVoznjaBtnClick);
+	$(".uspesnaVoznja").click(UspesnaVoznjaBtnClick);
+	$(".prihvatiVoznju").click(PrihvatiVoznjuBtnClick);
+}
+
+function NeuspsnaVoznjaBtnClick() {
+	var voznja = $(this).parent().parent().parent();
+	var idVoznje = $(voznja).attr('idVoznje');
+
+	AjaxPostaviStatusVoznje(idVoznje, "Neuspesna", function () {
+		$(voznja).find(".neuspesnaVoznja").first().remove();
+		$(voznja).find(".uspesnaVoznja").first().replaceWith("<span>--</span>");
+		$(voznja).removeClass("voznjaPrihvacena");
+		$(voznja).addClass("voznjaNeuspsna");
+		$(voznja).find(".voznjaStatus").first().text("Status: Neuspešna");
+		IMA_AKTIVNA_VOZNJA = false;
+		PrikaziDialogNoviKomentar(idVoznje);
+	});
+	
+}
+
+function UspesnaVoznjaBtnClick() {
+	var voznja = $(this).parent().parent().parent();
+	var idVoznje = $(voznja).attr('idVoznje');
+
+	AjaxPostaviStatusVoznje(idVoznje, "Uspesna", function () {
+		$(voznja).find(".neuspesnaVoznja").first().remove();
+		$(voznja).find(".uspesnaVoznja").first().replaceWith("<span>-</span>");
+		$(voznja).removeClass("voznjaPrihvacena");
+		$(voznja).addClass("voznjaUspesna");
+		$(voznja).find(".voznjaStatus").first().text("Status: Uspešna");
+		IMA_AKTIVNA_VOZNJA = false;
+	});
+}
+
+function PrihvatiVoznjuBtnClick() {
+	var voznja = $(this).parent().parent().parent();
+	var idVoznje = $(voznja).attr('idVoznje');
+	
+	AjaxPostaviVozacaVoznje(idVoznje, ACC_ID, function () {
+		AjaxPostaviStatusVoznje(idVoznje, "Prihvacena", function () {
+			$(voznja).find(".prihvatiVoznju").first().replaceWith("<button class='dugme uspesnaVoznja'>Uspešna vožnja</button></br><button class='dugme neuspesnaVoznja'>Neuspešna vožnja</button></br>");
+			$(".neuspesnaVoznja").click(NeuspsnaVoznjaBtnClick);
+			$(".uspesnaVoznja").click(UspesnaVoznjaBtnClick);
+			$(voznja).removeClass("voznjaKreirana");
+			$(voznja).addClass("voznjaPrihvacena");
+			$(voznja).find(".voznjaStatus").first().text("Status: Prihvaćena");
+		});
+	});
 }
 
 function NapraviHTMLVoznjeKartica(voznjeZaPrikaz, filter = null, sort = null) {
@@ -207,7 +261,7 @@ function NapraviHTMLVoznjeKartica(voznjeZaPrikaz, filter = null, sort = null) {
 						"<div class='col-12'><span> Ocena:</span><select id='ocenaOd'><option value=''></option><option value='0'>0</option><option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option><option value='5'>5</option></select>-<select id='ocenaDo'><option value=''></option><option value='0'>0</option><option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option><option value='5'>5</option></select></div>"+
 						"<div class='col-12'><span> Cena:</span><input id='cenaOd' type='text'>-<input id='cenaDo' type='text'></div>"+
 						toolbarHtmlDispecerDodatak + 
-					"<select id='sortOption'><option value='"+SORT_PRVO_NOVO+"'>Prvo najnovije</option><option value='"+SORT_PRVO_STARO+"'>Prvo najstarije</option><option value='"+SORT_PRVO_MIN_OCENA+"'>Prvo min ocena</option><option value='"+SORT_PRVO_MAX_OCENA+"'>Prvo max ocena</option></select>"+
+					"<span>Sortiraj: </span><select id='sortOption'><option value='"+SORT_PRVO_NOVO+"'>Prvo najnovije</option><option value='"+SORT_PRVO_STARO+"'>Prvo najstarije</option><option value='"+SORT_PRVO_MIN_OCENA+"'>Prvo min ocena</option><option value='"+SORT_PRVO_MAX_OCENA+"'>Prvo max ocena</option>"+((ACC_TYPE == "Vozac") ? "<option value='"+SORT_PRVO_NAJBLIZE_VOZNJE+"'>Prvo najbliže</option>": "")+"</select>"+
 					"<button class='dugme flotujDesno' id='btnFiltriraj'>Primeni</button></div></div>";
 	
 	sveVoznje = NapraviHTMLSveVoznje(voznjeZaPrikaz, filter, sort);
@@ -347,13 +401,8 @@ function BtnFiltrirajClick() {
 	_datumOd = (_datumOd == "Invalid date") ? null : _datumOd;
 	
 	var filter = NapraviFilter(_status, _datumOd, _datumDo, _ocenaOd, _ocenaDo, _cenaOd, _cenaDo, _vozIme, _vozPrez, _mustIme, _mustPrez);
-	console.log(_SORT);
 	$nesto.find("#ovoZameniPrilikomPrimeneFilteraSorta").replaceWith(NapraviHTMLSveVoznje(SVE_PRIKAZANE_VOZNJE, filter, _SORT));
-	$(".btnPrikaziKomentare").click(TogglePrikaziKomentareVoznje);
-	$(".btnSakrijKomentare").click(TogglePrikaziKomentareVoznje);
-	$(".lokacijaJedneVoznje").mouseover(PopUpLokacijaVoznje).mouseout(PopUpMouseOut);
-	$(".otkaziVoznju").click(OtkaziVoznju);
-	$(".DodajKomentar").click(DodajKomentar);
+	InitBtnsZaVoznje();
 	TOASTUJ("Filter je primenjen!");
 }
 
@@ -384,6 +433,7 @@ function NapraviHTMLJedneVoznje(voznja) {
 		dodatneKlase = " voznjaObradjena";
 		statusVoznjeZaPrikaz = "Obrađena";
 	} else if (STATUS_VOZNJE_FROM_INT[voznja['status']] == "Prihvacena") {
+		dodatneKlase = " voznjaPrihvacena";
 		statusVoznjeZaPrikaz = "Prihvaćena";
 	}
 	
@@ -425,7 +475,7 @@ function NapraviHTMLJedneVoznje(voznja) {
 		if (STATUS_VOZNJE_FROM_INT[voznja['status']] == "Kreirana") {
 			redDugmeDodatneKontrole = "<button class='dugme prihvatiVoznju'>Prihvati vožnju</button></br>";
 		} else if (STATUS_VOZNJE_FROM_INT[voznja['status']] == "Prihvacena" || STATUS_VOZNJE_FROM_INT[voznja['status']] == "Obradjena" || STATUS_VOZNJE_FROM_INT[voznja['status']] == "Formirana") {
-			redDugmeDodatneKontrole = "<button class='dugme uspesnaVoznja'>Uspesna vožnja</button></br><button class='dugme neuspesnaVoznja'>Neuspesna vožnja</button></br>";
+			redDugmeDodatneKontrole = "<button class='dugme uspesnaVoznja'>Uspešna vožnja</button></br><button class='dugme neuspesnaVoznja'>Neuspešna vožnja</button></br>";
 		}
 	} else if (ACC_TYPE == "Dispecer") {
 		if (STATUS_VOZNJE_FROM_INT[voznja['status']] == "Kreirana") {
@@ -1282,4 +1332,16 @@ function AjaxDodajAuto(_brojVozila, _godiste, _tip, _idVozaca, callbackFunc = nu
 			}
 		});
 	}
+}
+
+function AjaxPostaviVozacaVoznje(_idVoznje, _idVozaca, callbackFunc = null) {
+	$.post("/api/Voznje/SetDriver/" + _idVoznje + "/" + ACCESS_TOKEN, {idVozaca: _idVozaca}, function (data) {
+		if (data.indexOf("ERROR_") != -1) {
+			DisplayError(data);
+		} else if (data === "OK") {
+			if (callbackFunc != null) {
+				callbackFunc();
+			}
+		}
+	});
 }

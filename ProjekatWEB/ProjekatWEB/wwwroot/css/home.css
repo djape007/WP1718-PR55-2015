@@ -94,7 +94,7 @@ table {
 }
 
 .voznjaKreirana {
-	border-left: 5px solid green;
+	border-left: 5px solid yellow;
 }
 
 .voznjaNeuspsna, .voznjaOtkazana {
@@ -102,9 +102,11 @@ table {
 }
 
 .voznjaUspesna {
+	border-left: 5px solid green;
 }
 
-.voznjaObradjena {
+.voznjaObradjena, .voznjaPrihvacena {
+	border-left: 5px solid white;
 }
 
 .propName {
