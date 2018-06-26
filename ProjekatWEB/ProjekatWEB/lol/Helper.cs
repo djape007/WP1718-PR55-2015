@@ -32,7 +32,7 @@ namespace ProjekatWEB
         }
 
         public static double IzracunajCenuVoznje(Lokacija pocetak, Lokacija kraj) {
-            double cenaPoJediniciRazdaljine = 1.5;
+            double cenaPoJediniciRazdaljine = 0.2;
             double razdaljina = Math.Sqrt(Math.Pow(kraj.X - pocetak.X, 2) + Math.Pow(kraj.Y - pocetak.Y,2));
 
             return razdaljina * cenaPoJediniciRazdaljine;

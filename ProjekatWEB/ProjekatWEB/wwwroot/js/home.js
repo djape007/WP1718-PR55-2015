@@ -217,6 +217,7 @@ function UspesnaVoznjaBtnClick() {
 		$(voznja).addClass("voznjaUspesna");
 		$(voznja).find(".voznjaStatus").first().text("Status: Uspešna");
 		IMA_AKTIVNA_VOZNJA = false;
+		PrikaziDialogPostaviOdrediste(idVoznje);
 	});
 }
 
@@ -226,13 +227,61 @@ function PrihvatiVoznjuBtnClick() {
 	
 	AjaxPostaviVozacaVoznje(idVoznje, ACC_ID, function () {
 		AjaxPostaviStatusVoznje(idVoznje, "Prihvacena", function () {
-			$(voznja).find(".prihvatiVoznju").first().replaceWith("<button class='dugme uspesnaVoznja'>Uspešna vožnja</button></br><button class='dugme neuspesnaVoznja'>Neuspešna vožnja</button></br>");
-			$(".neuspesnaVoznja").click(NeuspsnaVoznjaBtnClick);
-			$(".uspesnaVoznja").click(UspesnaVoznjaBtnClick);
-			$(voznja).removeClass("voznjaKreirana");
-			$(voznja).addClass("voznjaPrihvacena");
-			$(voznja).find(".voznjaStatus").first().text("Status: Prihvaćena");
+			$(voznja).remove();
 		});
+	});
+}
+
+function PrikaziDialogPostaviOdrediste(idVoznje) {
+	PrikaziDialog("Postavi krajnju lokaciju", false, $(NapraviHTMLKrajnjaLokDialog()));
+	PostaviMapu("ovdeMapaFinalLok", "ovoJeMarkerFinalLok", function (jsonData, originalCoords) {
+		$("#finalLokX").val(originalCoords[0]);
+		$("#finalLokY").val(originalCoords[1]);
+		$("#finalLokUlica").val(jsonData["address"].road);
+		$("#finalLokBroj").val(("house_number" in jsonData["address"]) ? jsonData["address"].house_number : -1);
+		$("#finalLokMesto").val(("village" in jsonData["address"]) ? jsonData["address"].village : jsonData["address"].city );
+		$("#finalLokPostBr").val(jsonData["address"].postcode);
+		
+		PostaviDestinaciju(idVoznje);
+	});
+
+}
+
+function NapraviHTMLKrajnjaLokDialog() {
+	var s = "<div class='col-12'>"+
+	"<input id='finalLokX' type='hidden'/>"+
+	"<input id='finalLokY' type='hidden'/>"+
+	"<input id='finalLokUlica' type='hidden'/>"+
+	"<input id='finalLokBroj' type='hidden'/>"+
+	"<input id='finalLokMesto' type='hidden'/>"+
+	"<input id='finalLokPostBr' type='hidden'/>"+
+	"<div id='ovdeMapaFinalLok' class='mapaVisina'></div>"+
+	"<div id='ovoJeMarkerFinalLok' class='ovoJeMarker'></div>"+
+	"</div>";
+
+	return s;
+}
+
+function PostaviDestinaciju(idVoznje) {
+	var finalLokX = parseFloat($("#finalLokX").val());
+	var finalLokY = parseFloat($("#finalLokY").val());
+	var finalLokUlica = $("#finalLokUlica").val();
+	var finalLokBroj = $("#finalLokBroj").val();
+	var finalLokMesto = $("#finalLokMesto").val();
+	var finalLokPostanskiBr = $("#finalLokPostBr").val();
+
+	var finalLokObj = NapraviObjekatLokacija(finalLokX, finalLokY, finalLokUlica, finalLokBroj, finalLokMesto, finalLokPostanskiBr);
+	AjaxPostaviDestinaciju(idVoznje, finalLokObj);
+}
+
+function AjaxPostaviDestinaciju(idVoznje, destinacijaLokacijaObj) {
+	$.post("/api/Voznje/SetDestination/" + idVoznje + "/" + ACCESS_TOKEN, {krajLokacijaJSON: JSON.stringify(destinacijaLokacijaObj)}, function (data) {
+		if (data.indexOf("ERROR_") != -1) {
+			DisplayError(data);
+		} else if (data.indexOf("OK") != -1) {
+			TOASTUJ("Konačna lokacija je sačuvana");
+		}
+		DijalogMozeDaSeUgasi();
 	});
 }
 
