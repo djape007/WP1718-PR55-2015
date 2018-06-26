@@ -72,44 +72,5 @@ namespace ProjekatWEB.Controllers
                 return Helper.ForbidenAccessJson();
             }
         }
-
-        [HttpPost("[action]/{brojVozila}/{token}")]
-        public JsonResult Edit(string token, string brojVozila, int godiste, string tip) {
-            if (Authorize.IsAllowedToAccess(token, TipNaloga.Vozac | TipNaloga.Dispecer)) {
-                if ( brojVozila == null || brojVozila.Trim() == "") {
-                    return Json("ERROR_VEHICLE_NUMBER_IS_INVALID");
-                }
-
-                Automobil a = MainStorage.Instanca.Automobili.FirstOrDefault(x => x.BrojVozila == brojVozila);
-
-                if (a == null) {
-                    return Json("ERROR_VEHICLE_DOES_NOT_EXIST");
-                }
-
-                Vozac v = MainStorage.Instanca.Vozaci.FirstOrDefault(x => x.ID == Korisnik.GetIDFromToken(token));
-                if (v == null) {
-                    return Json("ERROR_DRIVER_DOES_NOT_EXIST");
-                } else if (v.Automobil == null) {
-                    return Json("ERROR_DRIVER_DOES_NOT_HAVE_A_VEHICLE");
-                }
-
-                if (Automobil.ZauzetBrojVozila(brojVozila)) {
-                    return Json("ERROR_VEHICLE_NUMBER_IN_USE");
-                }
-
-                a.BrojVozila = brojVozila;
-                a.GodisteAutomobila = godiste;
-                a.TipAutomobila = Helper.TipAutomobilaFromString(tip);
-
-                //automobil je uspesno napravljen, updateujem podatke vozaca
-                v.Automobil = a.BrojVozila;
-                MainStorage.Instanca.UpdateAutomobil(a);
-                MainStorage.Instanca.UpdateKorisnika(v);
-
-                return Json("OK_" + a.BrojVozila);
-            } else {
-                return Helper.ForbidenAccessJson();
-            }
-        }
     }
 }
