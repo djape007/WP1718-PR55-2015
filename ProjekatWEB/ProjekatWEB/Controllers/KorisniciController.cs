@@ -85,7 +85,6 @@ namespace ProjekatWEB.Controllers
                     } else if (!Korisnik.UsernameIsFree(username)) {
                         return Json("ERROR_USERNAME_IN_USE");
                     } else {
-                        Korisnik.RemoveUsernameInUse(k.Username);
                         k.Username = username;
                     }
                 }
