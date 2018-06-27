@@ -208,3 +208,7 @@ function NapraviObjekatLokacija(_x, _y, _ulica, _broj, _mesto, _postanskiBroj) {
 		}
 	}
 }
+
+function Razdaljina(lok1, lok2) {
+	return Math.sqrt(Math.pow(lok2.x - lok1.x, 2) + Math.pow(lok2.y - lok1.y,2));
+}

@@ -135,7 +135,7 @@ function DodajKarticuVozacKontrole() {
 
 function PrikaziVoznjeNaCekanju() {
 	if (ACC_TYPE === "Vozac" && !(IMA_AKTIVNA_VOZNJA)) {
-		AjaxZahtevSveVoznje(NapraviFilter("Kreirana"));
+		AjaxZahtevSveVoznje(NapraviFilter("Kreirana"), SORT_PRVO_NAJBLIZE_VOZNJE);
 	} else if (IMA_AKTIVNA_VOZNJA) {
 		DisplayError("Prihvaćena/Formirana vožnja nije završena");
 	}
@@ -188,6 +188,7 @@ function InitBtnsZaVoznje() {
 	$(".neuspesnaVoznja").click(NeuspsnaVoznjaBtnClick);
 	$(".uspesnaVoznja").click(UspesnaVoznjaBtnClick);
 	$(".prihvatiVoznju").click(PrihvatiVoznjuBtnClick);
+	$(".dodeliVoznju").click(DodeliVoznjuDialog);
 }
 
 function NeuspsnaVoznjaBtnClick() {
@@ -288,8 +289,8 @@ function AjaxPostaviDestinaciju(idVoznje, destinacijaLokacijaObj) {
 function NapraviHTMLVoznjeKartica(voznjeZaPrikaz, filter = null, sort = null) {
 	var sveVoznje = "";
 	
-	var selectStatusiVoznje = "";
-	selectStatusiVoznje += "<option value=''></option>";
+	var selectStatusiVoznje = "";				//quickfix
+	selectStatusiVoznje += (filter != null) ? "<option value='Kreirana' hidden>Kreirana</option>" : "<option value=''></option>";
 	for(var status in STATUS_VOZNJE_FROM_INT) {
 		selectStatusiVoznje += "<option value='"+STATUS_VOZNJE_FROM_INT[status]+"'>"+STATUS_VOZNJE_FROM_INT[status]+"</option>";
 	}
@@ -303,14 +304,14 @@ function NapraviHTMLVoznjeKartica(voznjeZaPrikaz, filter = null, sort = null) {
 	
 	var toolbarHtml = 	"<div class='col-12'>"+
 					"<div class='centriraj col-12'>Filteri</div>"+
-					"<div class='col-12'>"+
-						"<div class='col-12'><span>Status:</span><select id='filterStatus'>"+
+					"<div class='col-12'>"+														//jos jedan quickfix
+						"<div class='col-12'><span>Status:</span><select id='filterStatus' "+ (filter != null ? "disabled" : "")+">"+
 						selectStatusiVoznje + "</select></div>" +
 						"<div class='col-12'><span> Datum OD:</span><input id='dtpickOD' type='text'><span> DO:</span><input id='dtpickDO' type='text'></div>"+
 						"<div class='col-12'><span> Ocena:</span><select id='ocenaOd'><option value=''></option><option value='0'>0</option><option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option><option value='5'>5</option></select>-<select id='ocenaDo'><option value=''></option><option value='0'>0</option><option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option><option value='5'>5</option></select></div>"+
 						"<div class='col-12'><span> Cena:</span><input id='cenaOd' type='text'>-<input id='cenaDo' type='text'></div>"+
 						toolbarHtmlDispecerDodatak + 
-					"<span>Sortiraj: </span><select id='sortOption'><option value='"+SORT_PRVO_NOVO+"'>Prvo najnovije</option><option value='"+SORT_PRVO_STARO+"'>Prvo najstarije</option><option value='"+SORT_PRVO_MIN_OCENA+"'>Prvo min ocena</option><option value='"+SORT_PRVO_MAX_OCENA+"'>Prvo max ocena</option>"+((ACC_TYPE == "Vozac") ? "<option value='"+SORT_PRVO_NAJBLIZE_VOZNJE+"'>Prvo najbliže</option>": "")+"</select>"+
+					"<span>Sortiraj: </span><select id='sortOption'>"+((sort == SORT_PRVO_NAJBLIZE_VOZNJE) ? "<option value='"+SORT_PRVO_NAJBLIZE_VOZNJE+"' hidden>Prvo najbliže</option>" : "")+"<option value='"+SORT_PRVO_NOVO+"'>Prvo najnovije</option><option value='"+SORT_PRVO_STARO+"'>Prvo najstarije</option><option value='"+SORT_PRVO_MIN_OCENA+"'>Prvo min ocena</option><option value='"+SORT_PRVO_MAX_OCENA+"'>Prvo max ocena</option>"+((ACC_TYPE == "Vozac") ? "<option value='"+SORT_PRVO_NAJBLIZE_VOZNJE+"'>Prvo najbliže</option>": "")+"</select>"+
 					"<button class='dugme flotujDesno' id='btnFiltriraj'>Primeni</button></div></div>";
 	
 	sveVoznje = NapraviHTMLSveVoznje(voznjeZaPrikaz, filter, sort);
@@ -382,6 +383,14 @@ function NapraviHTMLSveVoznje(voznjeZaPrikaz, filter = null, sort = null) {
 						return 1;
 					} else {
 						return 0;
+					}
+				});
+			} else if (sort == SORT_PRVO_NAJBLIZE_VOZNJE && KORISNIK['trenutnaLokacija'] != null) {
+				ispunjavajuUslove.sort(function (a,b) {
+					if (Razdaljina(KORISNIK['trenutnaLokacija'], a['pocetnaLokacija']) >= Razdaljina(KORISNIK['trenutnaLokacija'], b['pocetnaLokacija'])) {
+						return 1;
+					} else {
+						return -1;
 					}
 				});
 			}
@@ -513,7 +522,8 @@ function NapraviHTMLJedneVoznje(voznja) {
 	var basicInfoOVoznji = 	"<span class='voznjaStatus'>Status: "+statusVoznjeZaPrikaz+"</span></br>"+
 						"<span class='voznjaDatum'>Datum: "+datumStr+"</span></br>"+
 						"<span class='voznjaCena'>Cena: "+voznja['iznos']+"</span></br>"+
-						"<span class='tipVozila'>Vozilo: "+tipVozilaPrikaz+"</span>";
+						"<span class='tipVozila'>Vozilo: "+tipVozilaPrikaz+"</span>"+
+						((ACC_TYPE == "Vozac" && STATUS_VOZNJE_FROM_INT[voznja['status']] == "Kreirana" && KORISNIK['trenutnaLokacija'] != null) ? "</br><span class='infoRazdaljina'>Udaljenost: "+Razdaljina(voznja['pocetnaLokacija'], KORISNIK['trenutnaLokacija'])+"</span>" : "");
 	
 	
 	var sviKomentari = NapraviHtmlSviKomentari(voznja['komentariOBJ']);
@@ -1196,6 +1206,7 @@ function AjaxPostaviTrenutnuLokaciju(objLokacija) {
 				DisplayError(data);
 			} else if (data.indexOf("OK") != -1) {
 				TOASTUJ("Nova lokacija je sačuvana");
+				AjaxGetKorisnika(ACC_ID, false);
 			}
 		});
 	}
@@ -1393,4 +1404,14 @@ function AjaxPostaviVozacaVoznje(_idVoznje, _idVozaca, callbackFunc = null) {
 			}
 		}
 	});
+}
+
+function DodeliVoznjuDialog() {
+	var voznja = $(this).parent().parent().parent();
+	var idVoznje = $(voznja).attr('idVoznje');
+	var lokObj = $(voznja).find(".lokacijaJedneVoznje").first();
+	var voznjaX = $(lokObj).attr("lokX");
+	var voznjaY = $(lokObj).attr("lokY");
+
+	PrikaziDialog("Dodeli vožnju", ture, sadrzaj);
 }
