@@ -1,16 +1,130 @@
 ﻿[
   {
-    "TrenutnaLokacija": null,
-    "Automobil": "",
-    "ID": 3,
-    "Username": "vozac",
-    "Password": "vozac",
-    "Ime": "Steva",
-    "Prezime": "Vozac",
+    "TrenutnaLokacija": {
+      "X": 2208065.0999594931,
+      "Y": 5658136.363267743,
+      "Adresa": {
+        "Ulica": "Ribarsko ostrvo",
+        "Broj": "-1",
+        "Mesto": "Novi Sad",
+        "PozivniBroj": "21000"
+      }
+    },
+    "Automobil": "0003",
+    "AutomobilOBJ": null,
+    "ID": 7,
+    "Username": "vozac3",
+    "Password": "vozac3",
+    "Ime": "Matija",
+    "Prezime": "Andr",
+    "Pol": 1,
+    "JMBG": "0000987654321",
+    "Telefon": "0214442231",
+    "Email": "neki@nesto.com",
+    "TipVoznje": 0,
+    "TipNaloga": 2,
+    "AktivanNalog": true
+  },
+  {
+    "TrenutnaLokacija": {
+      "X": 2210176.6728658713,
+      "Y": 5662416.8368517142,
+      "Adresa": {
+        "Ulica": "Episkopa Visariona",
+        "Broj": "4a",
+        "Mesto": "Novi Sad",
+        "PozivniBroj": "21101"
+      }
+    },
+    "Automobil": "0001",
+    "AutomobilOBJ": null,
+    "ID": 5,
+    "Username": "vozac1",
+    "Password": "vozac1",
+    "Ime": "Nemanja",
+    "Prezime": "Nem",
     "Pol": 0,
-    "JMBG": "3210987654321",
-    "Telefon": "555544433",
-    "Email": "vozac@kvote.rs",
+    "JMBG": "0000987654321",
+    "Telefon": "0214442231",
+    "Email": "neki@nesto.com",
+    "TipVoznje": 0,
+    "TipNaloga": 2,
+    "AktivanNalog": true
+  },
+  {
+    "TrenutnaLokacija": {
+      "X": 2208877.2433850234,
+      "Y": 5656722.2782444675,
+      "Adresa": {
+        "Ulica": "Ive Lole Ribara",
+        "Broj": "-1",
+        "Mesto": "",
+        "PozivniBroj": "21208"
+      }
+    },
+    "Automobil": "0002",
+    "AutomobilOBJ": null,
+    "ID": 6,
+    "Username": "vozac2",
+    "Password": "vozac2",
+    "Ime": "Stefan",
+    "Prezime": "Andr",
+    "Pol": 0,
+    "JMBG": "0000987654321",
+    "Telefon": "0214442231",
+    "Email": "neki@nesto.com",
+    "TipVoznje": 0,
+    "TipNaloga": 2,
+    "AktivanNalog": true
+  },
+  {
+    "TrenutnaLokacija": {
+      "X": 2207501.37687589,
+      "Y": 5669487.261968093,
+      "Adresa": {
+        "Ulica": "Bihacka",
+        "Broj": "42",
+        "Mesto": "Novi Sad",
+        "PozivniBroj": "21000"
+      }
+    },
+    "Automobil": "0004",
+    "AutomobilOBJ": null,
+    "ID": 8,
+    "Username": "vozac4",
+    "Password": "vozac4",
+    "Ime": "Goran",
+    "Prezime": "Andr",
+    "Pol": 0,
+    "JMBG": "0000987654321",
+    "Telefon": "0214442231",
+    "Email": "neki@nesto.com",
+    "TipVoznje": 0,
+    "TipNaloga": 2,
+    "AktivanNalog": true
+  },
+  {
+    "TrenutnaLokacija": {
+      "X": 2195997.6041189712,
+      "Y": 5676481.2500561867,
+      "Adresa": {
+        "Ulica": "Словачка",
+        "Broj": "-1",
+        "Mesto": "Novi Sad",
+        "PozivniBroj": "21000"
+      }
+    },
+    "Automobil": "0005",
+    "AutomobilOBJ": null,
+    "ID": 66,
+    "Username": "vozac5",
+    "Password": "vozac5",
+    "Ime": "Mire",
+    "Prezime": "Azdaja",
+    "Pol": 0,
+    "JMBG": "1234567890123",
+    "Telefon": "1234567",
+    "Email": "nesto@nesto.com",
     "TipVoznje": 0,
     "TipNaloga": 2,
     "AktivanNalog": true

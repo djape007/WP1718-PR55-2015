@@ -1,18 +1,22 @@
 ﻿[
   {
-    "ID": 2,
-    "Opis": "odlican voznja",
-    "DatumObjave": "2018-06-21T17:05:21.3352835+02:00",
-    "Autor": 3,
-    "Voznja": 2,
+    "ID": 1,
+    "Opis": "Slucajno sam zakazao",
+    "DatumObjave": "2018-06-27T14:05:29.690595+02:00",
+    "Autor": 16,
+    "AutorOBJ": null,
+    "Voznja": 1,
+    "VoznjaOBJ": null,
     "OcenaVoznje": 0
   },
   {
-    "ID": 3,
-    "Opis": "odlican voznja!!!!",
-    "DatumObjave": "2018-06-21T17:05:31.6054336+02:00",
-    "Autor": 3,
-    "Voznja": 2,
-    "OcenaVoznje": 2
+    "ID": 2,
+    "Opis": "odgovor",
+    "DatumObjave": "2018-06-27T14:12:03.0028467+02:00",
+    "Autor": 1,
+    "AutorOBJ": null,
+    "Voznja": 1,
+    "VoznjaOBJ": null,
+    "OcenaVoznje": 0
   }
 ]

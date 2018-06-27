@@ -1,0 +1,37 @@
+﻿[
+  {
+    "VozacID": 7,
+    "VozacOBJ": null,
+    "GodisteAutomobila": 2005,
+    "BrojVozila": "0003",
+    "TipAutomobila": 0
+  },
+  {
+    "VozacID": 5,
+    "VozacOBJ": null,
+    "GodisteAutomobila": 2008,
+    "BrojVozila": "0001",
+    "TipAutomobila": 1
+  },
+  {
+    "VozacID": 6,
+    "VozacOBJ": null,
+    "GodisteAutomobila": 2013,
+    "BrojVozila": "0002",
+    "TipAutomobila": 0
+  },
+  {
+    "VozacID": 8,
+    "VozacOBJ": null,
+    "GodisteAutomobila": 2009,
+    "BrojVozila": "0004",
+    "TipAutomobila": 0
+  },
+  {
+    "VozacID": 66,
+    "VozacOBJ": null,
+    "GodisteAutomobila": 2007,
+    "BrojVozila": "0005",
+    "TipAutomobila": 1
+  }
+]

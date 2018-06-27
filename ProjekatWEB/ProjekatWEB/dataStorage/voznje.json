@@ -1,95 +1,167 @@
 ﻿[
   {
-    "ID": 1,
-    "DatumNarucivanja": "2018-06-21T17:02:05.3916795+02:00",
+    "ID": 2,
+    "DatumNarucivanja": "2018-06-27T14:06:00.324032+02:00",
     "PocetnaLokacija": {
-      "X": 4.0,
-      "Y": 5.0,
+      "X": 2194898.8218373717,
+      "Y": 5659758.2614616705,
       "Adresa": {
-        "Ulica": "Svetosavska",
-        "Broj": "5b",
-        "Mesto": "Novi Sad",
-        "PozivniBroj": "21000"
+        "Ulica": "Rade Kondica",
+        "Broj": "-1",
+        "Mesto": "Futog",
+        "PozivniBroj": "21410"
       }
     },
     "MusterijaID": 4,
-    "Odrediste": {
-      "X": 2.0,
-      "Y": 9.0,
-      "Adresa": {
-        "Ulica": "Svetosavska",
-        "Broj": "15b",
-        "Mesto": "Novi Sad",
-        "PozivniBroj": "21000"
-      }
-    },
-    "DispecerID": 2,
-    "VozacID": 3,
-    "Iznos": 6.7082039324993694,
+    "MusterijaOBJ": null,
+    "Odrediste": null,
+    "DispecerID": -1,
+    "DispecerOBJ": null,
+    "VozacID": -1,
+    "VozacOBJ": null,
+    "Iznos": -1.0,
     "KomentarID": [],
-    "Status": 2,
-    "TipVoznje": 0
+    "KomentariOBJ": null,
+    "Status": 0,
+    "TipVoznje": 0,
+    "TipAutomobila": 0
   },
   {
-    "ID": 2,
-    "DatumNarucivanja": "2018-06-21T17:02:07.2721142+02:00",
+    "ID": 4,
+    "DatumNarucivanja": "2018-06-27T14:06:46.4021649+02:00",
     "PocetnaLokacija": {
-      "X": 4.0,
-      "Y": 5.0,
+      "X": 2209455.29841143,
+      "Y": 5654552.18323831,
       "Adresa": {
-        "Ulica": "Svetosavska",
-        "Broj": "5b",
-        "Mesto": "Novi Sad",
-        "PozivniBroj": "21000"
+        "Ulica": "Sremskih partizana",
+        "Broj": "9",
+        "Mesto": "",
+        "PozivniBroj": "21208"
       }
     },
-    "MusterijaID": 4,
-    "Odrediste": {
-      "X": 2.0,
-      "Y": 9.0,
-      "Adresa": {
-        "Ulica": "Svetosavska",
-        "Broj": "15b",
-        "Mesto": "Novi Sad",
-        "PozivniBroj": "21000"
-      }
-    },
-    "DispecerID": 2,
-    "VozacID": 3,
-    "Iznos": 6.7082039324993694,
+    "MusterijaID": 14,
+    "MusterijaOBJ": null,
+    "Odrediste": null,
+    "DispecerID": -1,
+    "DispecerOBJ": null,
+    "VozacID": -1,
+    "VozacOBJ": null,
+    "Iznos": -1.0,
     "KomentarID": [],
-    "Status": 2,
-    "TipVoznje": 0
+    "KomentariOBJ": null,
+    "Status": 0,
+    "TipVoznje": 0,
+    "TipAutomobila": 0
+  },
+  {
+    "ID": 5,
+    "DatumNarucivanja": "2018-06-27T14:07:06.431276+02:00",
+    "PocetnaLokacija": {
+      "X": 2184426.9489623024,
+      "Y": 5655592.443420128,
+      "Adresa": {
+        "Ulica": "Светозара Марковића",
+        "Broj": "-1",
+        "Mesto": "Beocin Municipality",
+        "PozivniBroj": "21410"
+      }
+    },
+    "MusterijaID": 15,
+    "MusterijaOBJ": null,
+    "Odrediste": null,
+    "DispecerID": -1,
+    "DispecerOBJ": null,
+    "VozacID": -1,
+    "VozacOBJ": null,
+    "Iznos": -1.0,
+    "KomentarID": [],
+    "KomentariOBJ": null,
+    "Status": 0,
+    "TipVoznje": 0,
+    "TipAutomobila": 0
+  },
+  {
+    "ID": 1,
+    "DatumNarucivanja": "2018-06-27T14:05:08.8396822+02:00",
+    "PocetnaLokacija": {
+      "X": 2208189.3101304565,
+      "Y": 5659812.6034114677,
+      "Adresa": {
+        "Ulica": "Bulevar Cara Lazara",
+        "Broj": "-1",
+        "Mesto": "Novi Sad",
+        "PozivniBroj": "21102"
+      }
+    },
+    "MusterijaID": 16,
+    "MusterijaOBJ": null,
+    "Odrediste": null,
+    "DispecerID": -1,
+    "DispecerOBJ": null,
+    "VozacID": -1,
+    "VozacOBJ": null,
+    "Iznos": -1.0,
+    "KomentarID": [
+      1,
+      2
+    ],
+    "KomentariOBJ": null,
+    "Status": 1,
+    "TipVoznje": 0,
+    "TipAutomobila": 1
   },
   {
     "ID": 3,
-    "DatumNarucivanja": "2018-06-21T17:02:18.8741336+02:00",
+    "DatumNarucivanja": "2018-06-27T14:06:23.9502935+02:00",
     "PocetnaLokacija": {
-      "X": 4.0,
-      "Y": 5.0,
+      "X": 2202251.1084955521,
+      "Y": 5665616.4430825887,
       "Adresa": {
-        "Ulica": "Svetosavska",
-        "Broj": "5b",
+        "Ulica": "Vladimira Grandica",
+        "Broj": "7",
         "Mesto": "Novi Sad",
         "PozivniBroj": "21000"
       }
     },
-    "MusterijaID": 4,
-    "Odrediste": {
-      "X": 2.0,
-      "Y": 9.0,
-      "Adresa": {
-        "Ulica": "Svetosavska",
-        "Broj": "15b",
-        "Mesto": "Novi Sad",
-        "PozivniBroj": "21000"
-      }
-    },
-    "DispecerID": 2,
-    "VozacID": 1,
-    "Iznos": 6.7082039324993694,
+    "MusterijaID": 13,
+    "MusterijaOBJ": null,
+    "Odrediste": null,
+    "DispecerID": 1,
+    "DispecerOBJ": null,
+    "VozacID": 5,
+    "VozacOBJ": null,
+    "Iznos": -1.0,
     "KomentarID": [],
+    "KomentariOBJ": null,
+    "Status": 3,
+    "TipVoznje": 0,
+    "TipAutomobila": 0
+  },
+  {
+    "ID": 6,
+    "DatumNarucivanja": "2018-06-27T14:13:23.0163127+02:00",
+    "PocetnaLokacija": {
+      "X": 2203844.3428038713,
+      "Y": 5661140.6967779221,
+      "Adresa": {
+        "Ulica": "Bate Brkica",
+        "Broj": "12",
+        "Mesto": "Novi Sad",
+        "PozivniBroj": "21137"
+      }
+    },
+    "MusterijaID": 15,
+    "MusterijaOBJ": null,
+    "Odrediste": null,
+    "DispecerID": 1,
+    "DispecerOBJ": null,
+    "VozacID": 6,
+    "VozacOBJ": null,
+    "Iznos": -1.0,
+    "KomentarID": [],
+    "KomentariOBJ": null,
     "Status": 2,
-    "TipVoznje": 0
+    "TipVoznje": 0,
+    "TipAutomobila": 0
   }
 ]
