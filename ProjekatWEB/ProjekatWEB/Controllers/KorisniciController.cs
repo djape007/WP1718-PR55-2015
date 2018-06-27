@@ -224,7 +224,7 @@ namespace ProjekatWEB.Controllers
                 List<Voznja> sveVoznje = MainStorage.Instanca.Voznje.Lista;
                 HashSet<int> idZauzetihVozaca = new HashSet<int>();
                 foreach (Voznja v in sveVoznje) {
-                    if (v.Status == StatusVoznje.Formirana || v.Status == StatusVoznje.Prihvacena) {
+                    if (v.Status == StatusVoznje.Formirana || v.Status == StatusVoznje.Prihvacena || v.Status == StatusVoznje.Obradjena) {
                         if (!idZauzetihVozaca.Contains(v.VozacID)) {
                             idZauzetihVozaca.Add(v.VozacID);
                         }

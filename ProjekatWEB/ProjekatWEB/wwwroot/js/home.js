@@ -199,6 +199,7 @@ function NeuspsnaVoznjaBtnClick() {
 		$(voznja).find(".neuspesnaVoznja").first().remove();
 		$(voznja).find(".uspesnaVoznja").first().replaceWith("<span>--</span>");
 		$(voznja).removeClass("voznjaPrihvacena");
+		$(voznja).removeClass("voznjaObradjena");
 		$(voznja).addClass("voznjaNeuspsna");
 		$(voznja).find(".voznjaStatus").first().text("Status: Neuspešna");
 		IMA_AKTIVNA_VOZNJA = false;
@@ -215,6 +216,7 @@ function UspesnaVoznjaBtnClick() {
 		$(voznja).find(".neuspesnaVoznja").first().remove();
 		$(voznja).find(".uspesnaVoznja").first().replaceWith("<span>-</span>");
 		$(voznja).removeClass("voznjaPrihvacena");
+		$(voznja).removeClass("voznjaObradjena");
 		$(voznja).addClass("voznjaUspesna");
 		$(voznja).find(".voznjaStatus").first().text("Status: Uspešna");
 		IMA_AKTIVNA_VOZNJA = false;
@@ -290,7 +292,7 @@ function NapraviHTMLVoznjeKartica(voznjeZaPrikaz, filter = null, sort = null) {
 	var sveVoznje = "";
 	
 	var selectStatusiVoznje = "";				//quickfix
-	selectStatusiVoznje += (filter != null) ? "<option value='Kreirana' hidden>Kreirana</option>" : "<option value=''></option>";
+	selectStatusiVoznje += (filter != null && ACC_TYPE == "Vozac") ? "<option value='Kreirana' hidden>Kreirana</option>" : "<option value=''></option>";
 	for(var status in STATUS_VOZNJE_FROM_INT) {
 		selectStatusiVoznje += "<option value='"+STATUS_VOZNJE_FROM_INT[status]+"'>"+STATUS_VOZNJE_FROM_INT[status]+"</option>";
 	}
@@ -305,7 +307,7 @@ function NapraviHTMLVoznjeKartica(voznjeZaPrikaz, filter = null, sort = null) {
 	var toolbarHtml = 	"<div class='col-12'>"+
 					"<div class='centriraj col-12'>Filteri</div>"+
 					"<div class='col-12'>"+														//jos jedan quickfix
-						"<div class='col-12'><span>Status:</span><select id='filterStatus' "+ (filter != null ? "disabled" : "")+">"+
+						"<div class='col-12'><span>Status:</span><select id='filterStatus' "+ ((filter != null && ACC_TYPE == "Vozac") ? "disabled" : "")+">"+
 						selectStatusiVoznje + "</select></div>" +
 						"<div class='col-12'><span> Datum OD:</span><input id='dtpickOD' type='text'><span> DO:</span><input id='dtpickDO' type='text'></div>"+
 						"<div class='col-12'><span> Ocena:</span><select id='ocenaOd'><option value=''></option><option value='0'>0</option><option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option><option value='5'>5</option></select>-<select id='ocenaDo'><option value=''></option><option value='0'>0</option><option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option><option value='5'>5</option></select></div>"+
@@ -521,9 +523,9 @@ function NapraviHTMLJedneVoznje(voznja) {
 						
 	var basicInfoOVoznji = 	"<span class='voznjaStatus'>Status: "+statusVoznjeZaPrikaz+"</span></br>"+
 						"<span class='voznjaDatum'>Datum: "+datumStr+"</span></br>"+
-						"<span class='voznjaCena'>Cena: "+voznja['iznos']+"</span></br>"+
+						"<span class='voznjaCena'>Cena: "+(voznja['iznos']).toString().split(".")[0]+"</span></br>"+
 						"<span class='tipVozila'>Vozilo: "+tipVozilaPrikaz+"</span>"+
-						((ACC_TYPE == "Vozac" && STATUS_VOZNJE_FROM_INT[voznja['status']] == "Kreirana" && KORISNIK['trenutnaLokacija'] != null) ? "</br><span class='infoRazdaljina'>Udaljenost: "+Razdaljina(voznja['pocetnaLokacija'], KORISNIK['trenutnaLokacija'])+"</span>" : "");
+						((ACC_TYPE == "Vozac" && STATUS_VOZNJE_FROM_INT[voznja['status']] == "Kreirana" && KORISNIK['trenutnaLokacija'] != null) ? "</br><span class='infoRazdaljina'>Udaljenost: "+ (Razdaljina(voznja['pocetnaLokacija'], KORISNIK['trenutnaLokacija'])).toString().split(".")[0] +"</span>" : "");
 	
 	
 	var sviKomentari = NapraviHtmlSviKomentari(voznja['komentariOBJ']);
@@ -1410,8 +1412,76 @@ function DodeliVoznjuDialog() {
 	var voznja = $(this).parent().parent().parent();
 	var idVoznje = $(voznja).attr('idVoznje');
 	var lokObj = $(voznja).find(".lokacijaJedneVoznje").first();
-	var voznjaX = $(lokObj).attr("lokX");
-	var voznjaY = $(lokObj).attr("lokY");
+	var voznjaX = parseFloat($(lokObj).attr("lokX"));
+	var voznjaY = parseFloat($(lokObj).attr("lokY"));
 
-	PrikaziDialog("Dodeli vožnju", ture, sadrzaj);
+
+	$.get("/api/Korisnici/AvailableDrivers/" + ACCESS_TOKEN, {}, function (dataVozaci) {
+		PrikaziDialog("Dodeli vožnju", true, $(NapraviHTMLDodeliVozacaDialog(idVoznje, voznjaX, voznjaY, dataVozaci)));
+		$("#dodeliVozacaBtn").click({param1: voznja}, DodeliVozaca);
+	});
+}
+
+function NapraviHTMLDodeliVozacaDialog(idVoznje, voznjaX, voznjaY, dataVozaci) {
+	var lokacijaVoznje = {x: voznjaX, y: voznjaY};
+	console.log(idVoznje);
+	dataVozaci.sort(function (a,b) {
+		if (Razdaljina(lokacijaVoznje, a['trenutnaLokacija']) >= Razdaljina(lokacijaVoznje, b['trenutnaLokacija'])) {
+			return 1;
+		} else {
+			return -1;
+		}
+	});
+	var html = "";
+	var inputVozaci = "";
+	if (dataVozaci.length == 0) {
+		inputVozaci = "<span id='blokirajDodeliVozaca'>Nema slobodnih vozača</span>";
+	} else {
+		inputVozaci = "<select id='dodeliSlobVozacID'>";
+		for (var voz in dataVozaci) {
+			var voziloINFO = "Nema vozilo";
+			if (dataVozaci[voz]['automobilOBJ'] != null) {
+				voziloINFO = TIP_VOZILA_FROM_INT[dataVozaci[voz]['automobilOBJ']['tipAutomobila']];
+			}
+			inputVozaci += "<option value='"+dataVozaci[voz]['id']+"'>"+ dataVozaci[voz]['username'] + " (" + voziloINFO + ", "+ (Razdaljina(lokacijaVoznje, dataVozaci[voz]['trenutnaLokacija'])).toString().split(".")[0]  +")" + "</option>";
+		}
+		inputVozaci += "</select>";
+	}
+
+	html = inputVozaci +
+	"</br><button id='dodeliVozacaBtn'>Dodeli</button>"+
+	"<input id='dodeliVozacaIdVoznje' type='hidden' value='"+idVoznje+"'>";
+	return "<div class='col-12'>"+ html + "</div>";
+}
+
+function DodeliVozaca(event) {
+	if (ACC_TYPE == "Dispecer") {
+		var voznja = event.data.param1;
+		var idVoznje = $("#dodeliVozacaIdVoznje").val();
+		var idVozaca = $("#dodeliSlobVozacID").val();
+
+		if ($("#blokirajDodeliVozaca").length) {
+			TOASTUJ("Nema slobodnih vozača");
+			return;
+		}
+
+		$.post("/api/Voznje/SetDriver/" + idVoznje + "/" + ACCESS_TOKEN, {idVozaca: idVozaca}, function (data) {
+			if (data.indexOf("ERROR_") != -1) {
+				DisplayError(data);
+			} else {
+				$.post("/api/Voznje/SetDispatcher/" + idVoznje + "/" + ACCESS_TOKEN, {idDisa: ACC_ID}, function (data2) {
+					if (data2.indexOf("ERROR_") != -1) {
+						DisplayError(data2);
+					} else {
+						AjaxPostaviStatusVoznje(idVoznje, "Obradjena");
+						$(voznja).find(".dodeliVoznju").first().replaceWith("<span>Dodeljeno</span>");
+						$(voznja).find(".voznjaStatus").first().text("Status: Obrađena");
+						$(voznja).removeClass("voznjaKreirana");
+						$(voznja).addClass("voznjaObradjena");
+						ZatvoriDijalog();
+					}
+				});
+			}
+		});
+	}
 }
